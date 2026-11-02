@@ -19,10 +19,19 @@ jobs:
         run: |
           packaged=$(uv run --no-project python -c "import tomllib,pathlib;print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
           test "${GITHUB_REF_NAME#v}" = "$packaged"
+      # 0.1.0 was published by hand before trusted publishing was set up: a version already on
+      # PyPI is not published again, so its tag run stays green.
+      - name: is this version already on PyPI
+        id: pypi
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' "https://pypi.org/pypi/ucits-etf-issuer-holdings/${GITHUB_REF_NAME#v}/json")
+          if [ "$code" = 200 ]; then echo "published=true" >> "$GITHUB_OUTPUT"; else echo "published=false" >> "$GITHUB_OUTPUT"; fi
       - run: uv sync --all-groups
       - run: uv run pytest
-      - run: uv build
-      - uses: pypa/gh-action-pypi-publish@release/v1
+      - if: steps.pypi.outputs.published != 'true'
+        run: uv build
+      - if: steps.pypi.outputs.published != 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
 
   npm:
     needs: pypi
@@ -41,9 +50,19 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: the tag must match the packaged version
         run: test "${GITHUB_REF_NAME#v}" = "$(node -p "require('./package.json').version")"
+      - name: is this version already on npm
+        id: npm
+        run: |
+          if npm view "ucits-etf-issuer-holdings@${GITHUB_REF_NAME#v}" version 2>/dev/null | grep -qx "${GITHUB_REF_NAME#v}"; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
       - run: npm ci
       - run: npm run build
       - run: npm test
       # trusted publishing through OIDC needs npm 11.5.1 or later
-      - run: npm install -g npm@latest
-      - run: npm publish --provenance --access public
+      - if: steps.npm.outputs.published != 'true'
+        run: npm install -g npm@latest
+      - if: steps.npm.outputs.published != 'true'
+        run: npm publish --provenance --access public
