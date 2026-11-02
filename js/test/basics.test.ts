@@ -7,6 +7,8 @@ import {
   IssuerUnavailable,
   NotListed,
   TransportError,
+  HoldingsClient,
+  LOOK_THROUGH_KEYS,
   lookThrough,
   nameOf,
   normalizeIsin,
@@ -19,6 +21,7 @@ import {
 } from "../dist/index.js";
 import { pyFloat, pyG, pyRound } from "../dist/pyish.js";
 import { unescapeHtml } from "../dist/htmlEntities.js";
+import { recordedTransport } from "../dist/testing.js";
 
 test("valid ISINs pass", () => {
   for (const isin of ["IE00B4L5Y983", "IE00BK5BQT80", "LU0274211480", "US0378331005", "IE000716YHJ7"]) {
@@ -125,4 +128,26 @@ test("html entities", () => {
   assert.equal(unescapeHtml("ELI LILLY &amp; CO"), "ELI LILLY & CO");
   assert.equal(unescapeHtml("A &#38; B &#x26; C &eacute; &lt;x&gt; &ampfoo"), "A & B & C é <x> &foo");
   assert.equal(unescapeHtml("no entity & here &unknown;"), "no entity & here &unknown;");
+});
+
+test("lookThrough by isin falls back to the name", async () => {
+  const base = makeFund();
+  const row = base.holdings[0]!;
+  const a = { ...base, isin: "IE00B4L5Y983", holdings: [
+    { ...row, name: "APPLE", weight: 50, isin: "US0378331005" },
+    { ...row, name: "NVIDIA Corp", weight: 30, isin: null },
+  ] };
+  const b = { ...base, isin: "IE00BK5BQT80", holdings: [
+    { ...row, name: "APPLE INC", weight: 10, isin: "US0378331005" },
+    { ...row, name: "NVIDIA Corp", weight: 20, isin: null },
+  ] };
+  const result = lookThrough({ [a.isin]: 1000, [b.isin]: 2000 }, { [a.isin]: a, [b.isin]: b }, "isin");
+  assert.deepEqual(result, [["US0378331005", 700], ["NVIDIA Corp", 700]]);
+  assert.ok(LOOK_THROUGH_KEYS.includes("isin"));
+  assert.throws(() => weightsBy(a, "isin" as WeightKey), RangeError);
+  const client = new HoldingsClient({ transport: recordedTransport(), cacheDir: null });
+  const positions = { IE00B4L5Y983: 1000, IE000716YHJ7: 1000 };
+  const funds = { IE00B4L5Y983: await client.get("IE00B4L5Y983"), IE000716YHJ7: await client.get("IE000716YHJ7") };
+  const apple = lookThrough(positions, funds, "isin").find(([k]) => k === "US0378331005")!;
+  assert.ok(Math.abs(apple[1] - (56.239 + 47.4)) < 1e-9);
 });

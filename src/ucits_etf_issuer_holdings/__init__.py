@@ -11,11 +11,12 @@ from .errors import (
     NotListed,
     TransportError,
 )
-from .look_through import look_through
+from .look_through import LOOK_THROUGH_KEYS, look_through
 from .models import ASSET_CLASSES, WEIGHT_KEYS, Fund, Holding
 
 __all__ = [
     "ASSET_CLASSES",
+    "LOOK_THROUGH_KEYS",
     "WEIGHT_KEYS",
     "Fund",
     "FundNotFound",

@@ -18,7 +18,8 @@ export {
 export type { RequestOptions, Transport } from "./http.js";
 export { normalizeIsin } from "./isin.js";
 export { ISSUER_ORDER } from "./issuers/index.js";
-export { lookThrough } from "./lookThrough.js";
+export { LOOK_THROUGH_KEYS, lookThrough } from "./lookThrough.js";
+export type { LookThroughKey } from "./lookThrough.js";
 export { ASSET_CLASSES, WEIGHT_KEYS, topHoldings, totalWeight, weightsBy } from "./models.js";
 export type { AssetClass, Fund, Holding, WeightBucket, WeightKey } from "./models.js";
 export { toIso2, nameOf } from "./countries.js";

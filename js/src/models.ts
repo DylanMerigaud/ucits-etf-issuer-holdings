@@ -91,11 +91,13 @@ function checkKey(key: string, label: string): asserts key is WeightKey {
 
 /** Sum weights per value of a Holding field; largest first, the null bucket last. */
 export function groupWeights(holdings: Iterable<Holding>, key: WeightKey): WeightBucket[] {
+  return groupPairs([...holdings].map((h): WeightBucket => [h[key], h.weight]));
+}
+
+/** Sum the weights of [bucket, weight] pairs; largest first, the null bucket last. */
+export function groupPairs(pairs: Iterable<WeightBucket>): WeightBucket[] {
   const totals = new Map<string | null, number>();
-  for (const holding of holdings) {
-    const bucket = holding[key];
-    totals.set(bucket, (totals.get(bucket) ?? 0) + holding.weight);
-  }
+  for (const [bucket, weight] of pairs) totals.set(bucket, (totals.get(bucket) ?? 0) + weight);
   const ordered: WeightBucket[] = [];
   for (const [bucket, total] of totals) {
     if (bucket !== null) ordered.push([bucket, pyRound(total, 6)]);

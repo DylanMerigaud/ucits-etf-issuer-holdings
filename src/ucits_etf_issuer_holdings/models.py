@@ -99,10 +99,14 @@ class Fund:
 
 def group_weights(holdings: Iterable[Holding], key: str) -> list[tuple[str | None, float]]:
     """Sum weights per value of a Holding attribute; largest first, None last."""
+    return group_pairs((getattr(holding, key), holding.weight) for holding in holdings)
+
+
+def group_pairs(pairs: Iterable[tuple[str | None, float]]) -> list[tuple[str | None, float]]:
+    """Sum the weights of (bucket, weight) pairs; largest first, the None bucket last."""
     totals: dict[str | None, float] = {}
-    for holding in holdings:
-        bucket = getattr(holding, key)
-        totals[bucket] = totals.get(bucket, 0.0) + holding.weight
+    for bucket, weight in pairs:
+        totals[bucket] = totals.get(bucket, 0.0) + weight
     ordered: list[tuple[str | None, float]] = sorted(
         ((k, round(v, 6)) for k, v in totals.items() if k is not None),
         key=lambda item: item[1],
