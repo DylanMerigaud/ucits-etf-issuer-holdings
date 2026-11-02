@@ -41,9 +41,10 @@ Every one answered with that honest user agent.
   Answer `data.funds[]`: `portId`, `profile.fundFullName`, `profile.fundCurrency`,
   `profile.identifiers[].altIdValue` (the ISIN). Page and answer cached 24 h together.
 - Holdings: same URL and headers, `operationName: "FundsHoldingsQuery"`, variables
-  `{"portIds": [id], "lastItemKey": null}` then the `lastItemKey` OBJECT the previous page returned
-  (passing it as a JSON string fails with "The provided starting key is invalid"); stop when it
-  is null; 1500 per page; a guard of 20 pages. The query text is in
+  `{"portIds": [id], "lastItemKey": null}` then the `lastItemKey` the previous page returned,
+  sent back exactly as received, never parsed or rebuilt (it comes as a string holding JSON,
+  `"{\"skey\":0.00685,\"portIdKey\":...}"`, which the schema types as `String`); stop when it is
+  null or empty; 1500 per page; a guard of 20 pages. The query text is in
   `src/ucits_etf_issuer_holdings/issuers/vanguard.py` as `HOLDINGS_QUERY`, word for word below.
   Answer: `data.funds[0].profile` (`fundFullName`, `fundCurrency`) and
   `data.borHoldings[0].holdings` (`items`, `totalHoldings`, `lastItemKey`). Item fields:
@@ -143,9 +144,10 @@ fund.total_weight                            # sum of weights, percent
 fund.weights_by("country")                   # [("US", 71.2), ("JP", 5.1), ..., (None, 0.3)]
 fund.top(10)
 fund.to_dict(); Fund.from_dict(d); fund.to_json()
-look_through({"IE00B4L5Y983": 7000, "IE00BK5BQT80": 3000}, funds, by="country")
-client = HoldingsClient(transport=None, cache_dir=DEFAULT_CACHE_DIR, issuers=None, timeout=30.0)
+look_through({"IE00B4L5Y983": 7000, "IE00BK5BQT80": 3000}, funds, by="country")  # or by="isin"
+client = HoldingsClient(transport=None, cache_dir=<default>, issuers=None, timeout=30.0)
 client.get(isin, issuer=None) -> Fund
+client.close()   # or: with HoldingsClient() as client: ...
 from ucits_etf_issuer_holdings.testing import recorded_transport, RECORDED_ISINS   # offline replay
 ```
 
@@ -155,12 +157,30 @@ Errors (`ucits_etf_issuer_holdings.errors`, all subclass `HoldingsError`): `Inva
 why each one did not).
 
 Holding: `name: str`, `weight: float` (percent of the fund), `isin`, `ticker`, `country`
-(ISO alpha-2), `country_name`, `sector`, `currency`, `asset_class` (all `str | None`).
+(ISO alpha-2), `country_name`, `sector`, `currency`, `asset_class`, `asset_class_raw` (all
+`str | None`). `asset_class` is one of `ASSET_CLASSES`: `equity`, `fixed_income`, `cash`,
+`derivative`, `fund`, `real_estate`, `commodity`, `other` (a label not in the mapping), or None
+when the issuer gives no class; `asset_class_raw` is the issuer's own label. The mapping
+(`issuers/asset_classes.py`), case-insensitive: iShares `Equity` equity, `Fixed Income`
+fixed_income, `Money Market`, `Cash`, `Cash Collateral and Margins` cash, `FX`, `Futures`,
+`Swaps`, `Derivative` derivative, `Real Estate` real_estate; Xtrackers `Equities` equity,
+`Bonds`, `Fixed Income` fixed_income, `Cash`, `Currency` cash, `Futures`, `Swaps`, `Forwards`
+derivative, `Funds`, `Mutual Fund` fund; Vanguard by `securityType` prefix: `EQ.REIT`
+real_estate, `EQ.ETF` fund, other `EQ.` equity, `MF.` fund, `FI.` fixed_income, `MM.`, `CT.`,
+`CRNY` cash, `DE.` derivative; Amundi by `type` prefix: `EQUITY` equity, `BOND`,
+`FIXED_INCOME` fixed_income, `CASH`, `CURRENCY` cash, `FUTURE`, `SWAP`, `FORWARD`, `OPTION`,
+`DERIVATIVE` derivative, `FUND`, `ETF` fund. SPDR and Invesco publish no class: both None.
 `country` is filled from `country_name` through `countries.to_iso2`, or directly when the issuer
 gives a code (Vanguard); `country_name` from `countries.name_of` when only the code is given.
 
 JSON schema: `schema/fund.schema.json` (draft 2020-12), keys exactly the field names above,
-`as_of` `YYYY-MM-DD` or null, `fetched_at` ISO 8601 UTC. Both languages emit it.
+`as_of` `YYYY-MM-DD` or null (an issuer datetime is cut to its date; anything else is null),
+`fund_name` and `currency` a non-empty string or null, `fetched_at` ISO 8601 UTC: when the
+issuer's answer was downloaded, for a cached or stale copy the time it was stored, and when
+several answers were used (index and holdings, Vanguard pages) the oldest. Both languages emit it.
+
+`look_through` groups by `LOOK_THROUGH_KEYS`: the four `WEIGHT_KEYS` plus `isin` (the holding's
+ISIN, or its name when it has none). `weights_by` and the CLI `--by` take the four `WEIGHT_KEYS`.
 
 CLI: `ucits-holdings ISIN [--issuer NAME] [--format json|csv|table] [--by country|sector|currency|asset_class] [--no-cache]`.
 
@@ -170,26 +190,41 @@ CLI: `ucits-holdings ISIN [--issuer NAME] [--format json|csv|table] [--by countr
 - `countries.py`: `to_iso2(text) -> str | None` (two letters that are a known code pass through;
   otherwise lookup lower-cased in `_country_data.NAME_TO_ISO2`), `name_of(code) -> str | None`.
 - `http.py`: `Response` dataclass (`status`, `content: bytes`, `content_type`, `url`,
-  `stale=False`, `.text`, `.json()`), `Transport` Protocol
+  `stale=False`, `stored_at` (epoch seconds: now for a live answer, the store time for a cached
+  one), `.text`, `.json()`), `Transport` Protocol
   `request(method, url, *, params=None, json=None, headers=None, ttl=None) -> Response`,
   `HttpxTransport(timeout)` (httpx.Client, `follow_redirects=True`, trust_env so HTTPS_PROXY and
-  ALL_PROXY work; network errors become `TransportError`), `CachingTransport(inner, cache_dir)`:
-  key = sha256 of method, url, sorted params, canonical JSON body; stores body plus meta for 200
-  answers only; a fresh copy (age < ttl) is returned without a request; when the live request
-  raises `TransportError` or answers >= 500 and a stale copy exists, the stale copy is returned
-  with `stale=True`. `ttl=None` means no caching for that call.
+  ALL_PROXY work; network errors become `TransportError`; `close()`),
+  `CachingTransport(inner, cache_dir)`: key = sha256 of method, url, sorted params, canonical
+  JSON body; one file per key, `<key>.cache`, a JSON line of meta (`stored_at`, `content_type`,
+  `url`) then the body, written to a temporary file and renamed into place; 200 answers only; a
+  fresh copy (age < ttl) is returned without a request; when the live request raises
+  `TransportError` or answers 403, 408, 429 or >= 500 and a stale copy exists, the stale copy is
+  returned with `stale=True`. `request(..., validate=callable)`: a new 200 answer is stored only
+  when `validate(response)` returns; when it raises, the previous copy stays and is served
+  stale, or with no copy the live answer is returned unstored. `ttl=None` means no caching for
+  that call. The TypeScript port shares one download between concurrent identical requests.
 - `xlsx.py`: `read_sheet(data: bytes) -> tuple[str, list[list[str | float | None]]]` (sheet name,
   rows), stdlib only (zipfile, xml.etree): first sheet of `xl/workbook.xml`, its target through
   `xl/_rels/workbook.xml.rels`, shared strings, inline strings, numbers, booleans, cell
   references with gaps filled by None, any namespace prefix.
 - `issuers/`: one module per issuer, each a class with `name` and
-  `fetch(isin: str, http: Transport) -> Fund` raising `NotListed` or `IssuerUnavailable`.
+  `fetch(isin: str, http: Transport) -> Fund` raising `NotListed` or `IssuerUnavailable`. Each
+  answer is read by a parse function (`base.fetch_parsed`) that checks every shape with
+  isinstance before using it: a changed container is `IssuerUnavailable`, a line that is not an
+  object is dropped. The same parse function is the cache's `validate` (a `NotListed` counts as
+  understood), so an answer the adapter cannot read never replaces a good cached copy.
   `ORDER = ("ishares", "vanguard", "spdr", "xtrackers", "amundi", "invesco")`: the issuers
   whose answer is an index (cached a day) first, then the ones asked by ISIN.
   TTL: indexes 24 h, holdings 6 h.
 - `client.py`: `HoldingsClient.get` validates the ISIN, asks the named issuer only or each issuer
   of ORDER; `NotListed` and `IssuerUnavailable` are kept as reasons and the next issuer is asked;
-  first holdings win; none: `FundNotFound`. A Fund with zero holdings is `IssuerUnavailable`.
+  any other error that is not a `HoldingsError` is kept as `unexpected answer: <type>: <message>`
+  and the next issuer is asked; first holdings win; none: `FundNotFound`. A Fund with zero
+  holdings is `IssuerUnavailable`. Cache rule: with no transport the client caches in
+  `DEFAULT_CACHE_DIR`; a transport you pass is not cached unless you pass a `cache_dir` (any
+  value, the default path included); `cache_dir=None` never caches. `close()` and the context
+  manager close the httpx client the object made; `get_holdings` closes its client.
 - `testing/`: `RecordedTransport` replays `testing/recorded/index.json` (entries: `method`, `url`,
   `params` or null, `match_json` or null, `status`, `content_type`, `file`). A request matches an
   entry when method and url are equal, params equal (values compared as strings) when the entry
@@ -207,7 +242,7 @@ Same issuers, same endpoints, same JSON shape (the objects ARE the schema: snake
 `inflateRawSync` for the xlsx zip, `node:fs` for the cache). API:
 `getHoldings(isin, opts?)`, `new HoldingsClient({ transport?, cacheDir?, issuers?, timeoutMs? })`,
 `client.get(isin, { issuer? })`, `weightsBy(fund, key)`, `topHoldings(fund, n)`,
-`lookThrough(positions, funds, by)`, errors as classes with the same names, and
+`lookThrough(positions, funds, by)`, `ASSET_CLASSES`, `LOOK_THROUGH_KEYS`, errors as classes with the same names, and
 `ucits-etf-issuer-holdings/testing` exporting `recordedTransport()` and `RECORDED_ISINS` over the
 same recorded files (copied into `js/recorded/` by `npm run build`). Tests: `node:test` on the
 compiled output, the same per issuer expectations as Python, plus a test that a Python-made JSON
@@ -225,7 +260,9 @@ and a TS-made JSON for the same recorded fund are equal apart from `fetched_at`.
 - Contract tests (`tests/contract/`, marker `live`, run when `UCITS_HOLDINGS_LIVE=1`): one per
   issuer on a large real fund (IE00B4L5Y983, IE00BK5BQT80, IE00BJ0KDQ92, IE000BI8OT95,
   IE00B5M1WJ87, IE000716YHJ7): at least 20 holdings, weights summing to 90 to 110, an as-of date
-  within 45 days, at least 80 percent of weight with a country where the issuer gives one.
+  within 45 days (75 for Vanguard, whose holdings are month end), at least 80 percent of weight
+  with a country where the issuer gives one. `scripts/measure_coverage.py` prints the weight sum
+  and country coverage of the same funds (the README figures come from it).
   `.github/workflows/contract.yml` runs them every day at 06:00 UTC for both languages, so an
   endpoint move turns the badge red the next morning.
 

@@ -4,6 +4,9 @@ Full holdings of a UCITS ETF by ISIN, read from the issuer's own published files
 shape: iShares, Vanguard, Xtrackers, Amundi, SPDR and Invesco. Zero runtime dependencies, Node 20
 or later, typed. The same library exists for Python and emits the same JSON.
 
+It runs on Node.js only: the cache and the xlsx reader use `node:fs`, `node:zlib` and
+`node:crypto`, so it does not run in a browser or a webview.
+
 Use it for portfolio look-through, asset allocation or a holdings export when a data vendor is
 not an option.
 
@@ -29,7 +32,10 @@ console.log(topHoldings(fund, 5).map((h) => `${h.name} ${h.weight}`));
 
 `client.get(isin, { issuer: "ishares" })` asks one issuer only. When no issuer returns holdings
 the call rejects with `FundNotFound`, whose `reasons` say why each one did not. Look-through over
-several funds: `lookThrough({ IE00B4L5Y983: 7000, IE00BK5BQT80: 3000 }, funds, "country")`.
+several funds: `lookThrough({ IE00B4L5Y983: 7000, IE00BK5BQT80: 3000 }, funds, "country")`, or
+`"isin"` for a single-name concentration. `asset_class` is one of `ASSET_CLASSES` (`equity`,
+`fixed_income`, `cash`, `derivative`, `fund`, `real_estate`, `commodity`, `other`) and
+`asset_class_raw` keeps the issuer's own label.
 
 Command line: `npx -p ucits-etf-issuer-holdings ucits-holdings IE00B4L5Y983 --format table --by country`.
 
