@@ -166,6 +166,31 @@ The usual workaround is a hand-kept map of issuer endpoints inside each app (see
 This library is that map, shared, tested every day, in the two languages the trackers are
 written in.
 
+## Plugging it into a tracker
+
+Most trackers store a fund's exposure as a list of `{code, weight}` pairs with weights as
+fractions. That is one call:
+
+<!-- harness: skip -->
+```ts
+import { getHoldings, weightsBy } from "ucits-etf-issuer-holdings";
+
+async function countryProfile(isin: string) {
+  const fund = await getHoldings(isin);
+  return weightsBy(fund, "country")
+    .filter(([code]) => code !== null)
+    .map(([code, pct]) => ({ code, weight: pct / 100 }));
+}
+```
+
+The same pattern gives sectors (`"sector"`) or a single-name concentration across a portfolio
+(`look_through(..., by=...)` in Python, `lookThrough` in TypeScript). Open requests this answers:
+[Ghostfolio #5924](https://github.com/ghostfolio/ghostfolio/issues/5924) (ETF country and holdings
+data), [Wealthfolio #827](https://github.com/wealthfolio/wealthfolio/issues/827) (UCITS
+look-through), [Portfolio Performance #1665](https://github.com/portfolio-performance/portfolio/issues/1665)
+(asset allocation from the holdings list; its Java code can call the `ucits-holdings` CLI with
+`--by country --format csv`).
+
 ## Notes
 
 - **Swap based ETFs** (for example "Amundi MSCI World Swap") publish their substitute basket,
