@@ -6,8 +6,8 @@ import json
 
 import pytest
 
-from ucits_etf_holdings.cli import HOLDING_COLUMNS, main
-from ucits_etf_holdings.testing import recorded_transport
+from ucits_etf_issuer_holdings.cli import HOLDING_COLUMNS, main
+from ucits_etf_issuer_holdings.testing import recorded_transport
 
 
 def run(args: list[str], capsys: pytest.CaptureFixture[str]) -> tuple[int, str, str]:

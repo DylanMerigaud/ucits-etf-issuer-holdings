@@ -7,8 +7,8 @@ from collections.abc import Callable
 from dataclasses import replace
 from typing import Any
 
-from ucits_etf_holdings.http import Response
-from ucits_etf_holdings.testing import RecordedTransport
+from ucits_etf_issuer_holdings.http import Response
+from ucits_etf_issuer_holdings.testing import RecordedTransport
 
 Rewrite = Callable[[str, str, Response], Response]
 

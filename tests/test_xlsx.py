@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from ucits_etf_holdings.xlsx import read_sheet
+from ucits_etf_issuer_holdings.xlsx import read_sheet
 
-RECORDED = Path(__file__).parent.parent / "src/ucits_etf_holdings/testing/recorded"
+RECORDED = Path(__file__).parent.parent / "src/ucits_etf_issuer_holdings/testing/recorded"
 
 
 def build(sheet_xml: str, shared: str | None = None, sheets: str | None = None) -> bytes:

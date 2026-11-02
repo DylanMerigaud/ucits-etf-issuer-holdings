@@ -1,7 +1,7 @@
 import pytest
 
-from ucits_etf_holdings.errors import InvalidISIN
-from ucits_etf_holdings.isin import normalize
+from ucits_etf_issuer_holdings.errors import InvalidISIN
+from ucits_etf_issuer_holdings.isin import normalize
 
 
 def test_valid_isins_pass() -> None:

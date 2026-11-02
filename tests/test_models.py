@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from ucits_etf_holdings.models import Fund, Holding
+from ucits_etf_issuer_holdings.models import Fund, Holding
 
 
 def make_fund() -> Fund:

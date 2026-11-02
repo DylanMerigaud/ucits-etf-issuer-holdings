@@ -6,10 +6,10 @@ import zipfile
 import pytest
 from stubs import RewritingTransport
 
-from ucits_etf_holdings.errors import IssuerUnavailable, NotListed
-from ucits_etf_holdings.http import Response
-from ucits_etf_holdings.issuers.spdr import SpdrIssuer
-from ucits_etf_holdings.testing import recorded_transport
+from ucits_etf_issuer_holdings.errors import IssuerUnavailable, NotListed
+from ucits_etf_issuer_holdings.http import Response
+from ucits_etf_issuer_holdings.issuers.spdr import SpdrIssuer
+from ucits_etf_issuer_holdings.testing import recorded_transport
 
 
 def test_fund() -> None:
@@ -84,7 +84,7 @@ def test_xlsx_without_header_row_is_unavailable() -> None:
 
 
 def test_slug() -> None:
-    from ucits_etf_holdings.issuers.spdr import slug_of
+    from ucits_etf_issuer_holdings.issuers.spdr import slug_of
 
     assert slug_of("SPYW GY") == "spyw-gy"
     assert slug_of("ZPRV GY^") == "zprv-gy"

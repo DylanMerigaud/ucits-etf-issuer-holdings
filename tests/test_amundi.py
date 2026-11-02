@@ -3,10 +3,10 @@ from __future__ import annotations
 import pytest
 from stubs import RewritingTransport, StaticTransport, with_json
 
-from ucits_etf_holdings.errors import IssuerUnavailable, NotListed, TransportError
-from ucits_etf_holdings.http import Response
-from ucits_etf_holdings.issuers.amundi import AmundiIssuer
-from ucits_etf_holdings.testing import RecordedTransport, recorded_transport
+from ucits_etf_issuer_holdings.errors import IssuerUnavailable, NotListed, TransportError
+from ucits_etf_issuer_holdings.http import Response
+from ucits_etf_issuer_holdings.issuers.amundi import AmundiIssuer
+from ucits_etf_issuer_holdings.testing import RecordedTransport, recorded_transport
 
 
 def test_core_fund() -> None:

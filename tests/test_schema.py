@@ -7,8 +7,8 @@ from typing import Any
 import pytest
 from jsonschema import Draft202012Validator
 
-from ucits_etf_holdings import HoldingsClient
-from ucits_etf_holdings.testing import RECORDED_ISINS, recorded_transport
+from ucits_etf_issuer_holdings import HoldingsClient
+from ucits_etf_issuer_holdings.testing import RECORDED_ISINS, recorded_transport
 
 SCHEMA = json.loads((Path(__file__).parent.parent / "schema/fund.schema.json").read_text())
 

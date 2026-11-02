@@ -44,7 +44,7 @@ Every one answered with that honest user agent.
   `{"portIds": [id], "lastItemKey": null}` then the `lastItemKey` OBJECT the previous page returned
   (passing it as a JSON string fails with "The provided starting key is invalid"); stop when it
   is null; 1500 per page; a guard of 20 pages. The query text is in
-  `src/ucits_etf_holdings/issuers/vanguard.py` as `HOLDINGS_QUERY`, word for word below.
+  `src/ucits_etf_issuer_holdings/issuers/vanguard.py` as `HOLDINGS_QUERY`, word for word below.
   Answer: `data.funds[0].profile` (`fundFullName`, `fundCurrency`) and
   `data.borHoldings[0].holdings` (`items`, `totalHoldings`, `lastItemKey`). Item fields:
   `issuerName`, `securityLongDescription`, `gicsSectorDescription`, `marketValuePercentage`
@@ -131,10 +131,10 @@ These are the files each issuer serves to any visitor of its public product page
 fetches one file per fund on demand, caches it, and sends an identifying user agent. The README
 says the user is responsible for the issuer's website terms.
 
-## 2. Public API (Python, package `ucits_etf_holdings`, distribution `ucits-etf-issuer-holdings`)
+## 2. Public API (Python, package `ucits_etf_issuer_holdings`, distribution `ucits-etf-issuer-holdings`)
 
 ```python
-from ucits_etf_holdings import get_holdings, HoldingsClient, Fund, Holding, look_through
+from ucits_etf_issuer_holdings import get_holdings, HoldingsClient, Fund, Holding, look_through
 fund = get_holdings("IE00B4L5Y983")            # tries every issuer, cached
 fund = get_holdings("IE00B4L5Y983", issuer="ishares")
 fund.isin, fund.issuer, fund.fund_name, fund.as_of, fund.currency, fund.source_url
@@ -146,10 +146,10 @@ fund.to_dict(); Fund.from_dict(d); fund.to_json()
 look_through({"IE00B4L5Y983": 7000, "IE00BK5BQT80": 3000}, funds, by="country")
 client = HoldingsClient(transport=None, cache_dir=DEFAULT_CACHE_DIR, issuers=None, timeout=30.0)
 client.get(isin, issuer=None) -> Fund
-from ucits_etf_holdings.testing import recorded_transport, RECORDED_ISINS   # offline replay
+from ucits_etf_issuer_holdings.testing import recorded_transport, RECORDED_ISINS   # offline replay
 ```
 
-Errors (`ucits_etf_holdings.errors`, all subclass `HoldingsError`): `InvalidISIN`,
+Errors (`ucits_etf_issuer_holdings.errors`, all subclass `HoldingsError`): `InvalidISIN`,
 `NotListed(issuer, isin, reason)`, `IssuerUnavailable(issuer, reason)`,
 `FundNotFound(isin, reasons: dict[str, str])` (no issuer answered with holdings; the reasons say
 why each one did not).
@@ -234,7 +234,7 @@ and a TS-made JSON for the same recorded fund are equal apart from `fetched_at`.
 - E1 install-built: hatchling wheel, `httpx` the only dependency; the npm tarball ships `dist/`,
   `recorded/`, types.
 - E2 quickstart-runs: the README blocks that call the network are marked
-  `<!-- harness: skip -->`; the offline block uses `ucits_etf_holdings.testing.recorded_transport()`
+  `<!-- harness: skip -->`; the offline block uses `ucits_etf_issuer_holdings.testing.recorded_transport()`
   and runs as written.
 - E3 tests-green: `pytest` passes offline (live tests skipped without `UCITS_HOLDINGS_LIVE=1`).
 - E4 api-typed: `py.typed`, mypy strict, every public signature annotated.

@@ -1,4 +1,4 @@
-from ucits_etf_holdings.errors import (
+from ucits_etf_issuer_holdings.errors import (
     FundNotFound,
     HoldingsError,
     InvalidISIN,

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ucits_etf_holdings.testing import RECORDED_ISINS, RecordedTransport, recorded_transport
+from ucits_etf_issuer_holdings.testing import RECORDED_ISINS, RecordedTransport, recorded_transport
 
 
 def test_recorded_isins() -> None:

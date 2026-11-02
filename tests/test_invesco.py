@@ -3,10 +3,10 @@ from __future__ import annotations
 import pytest
 from stubs import StaticTransport
 
-from ucits_etf_holdings.errors import IssuerUnavailable, NotListed
-from ucits_etf_holdings.http import Response
-from ucits_etf_holdings.issuers.invesco import InvescoIssuer
-from ucits_etf_holdings.testing import recorded_transport
+from ucits_etf_issuer_holdings.errors import IssuerUnavailable, NotListed
+from ucits_etf_issuer_holdings.http import Response
+from ucits_etf_issuer_holdings.issuers.invesco import InvescoIssuer
+from ucits_etf_issuer_holdings.testing import recorded_transport
 
 
 def test_fund() -> None:

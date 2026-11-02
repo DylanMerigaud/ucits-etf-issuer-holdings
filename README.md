@@ -23,7 +23,7 @@ npm install ucits-etf-issuer-holdings        # Node 20+, no runtime dependency
 
 <!-- harness: skip -->
 ```python
-from ucits_etf_holdings import get_holdings
+from ucits_etf_issuer_holdings import get_holdings
 
 fund = get_holdings("IE00B4L5Y983")   # iShares Core MSCI World
 print(fund.fund_name, fund.as_of, len(fund.holdings))
@@ -49,8 +49,8 @@ The package ships trimmed copies of real issuer answers. The same code runs on t
 network, which is also how you test your own code against this library:
 
 ```python
-from ucits_etf_holdings import HoldingsClient
-from ucits_etf_holdings.testing import RECORDED_ISINS, recorded_transport
+from ucits_etf_issuer_holdings import HoldingsClient
+from ucits_etf_issuer_holdings.testing import RECORDED_ISINS, recorded_transport
 
 client = HoldingsClient(transport=recorded_transport())
 for isin in RECORDED_ISINS:
@@ -61,8 +61,8 @@ for isin in RECORDED_ISINS:
 ### Look-through of a portfolio
 
 ```python
-from ucits_etf_holdings import HoldingsClient, look_through
-from ucits_etf_holdings.testing import recorded_transport
+from ucits_etf_issuer_holdings import HoldingsClient, look_through
+from ucits_etf_issuer_holdings.testing import recorded_transport
 
 positions = {"IE00B4L5Y983": 6000, "IE00BK5BQT80": 3000, "LU0274211480": 1000}
 client = HoldingsClient(transport=recorded_transport())  # drop transport= for live data

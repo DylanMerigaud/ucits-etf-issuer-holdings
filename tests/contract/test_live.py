@@ -10,7 +10,7 @@ from datetime import date, datetime
 
 import pytest
 
-from ucits_etf_holdings import HoldingsClient
+from ucits_etf_issuer_holdings import HoldingsClient
 
 pytestmark = [
     pytest.mark.live,

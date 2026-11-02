@@ -15,7 +15,7 @@ cd js && npm test
 ```
 
 The default suites never touch the network: every issuer test replays the trimmed real answers in
-`src/ucits_etf_holdings/testing/recorded/`. The contract tests do call the issuers:
+`src/ucits_etf_issuer_holdings/testing/recorded/`. The contract tests do call the issuers:
 
 ```sh
 UCITS_HOLDINGS_LIVE=1 uv run pytest tests/contract -m live -v
@@ -29,7 +29,7 @@ To fix one:
 
 1. Find the new request in the issuer's product page (the browser's network tab, on the page that
    shows the holdings table or offers the download).
-2. Update the issuer module in both languages (`src/ucits_etf_holdings/issuers/<issuer>.py` and
+2. Update the issuer module in both languages (`src/ucits_etf_issuer_holdings/issuers/<issuer>.py` and
    `js/src/issuers/<issuer>.ts`) and the section of `docs/PLAN.md` that describes it.
 3. Re-record the trimmed answers, keep them small, and update `testing/recorded/index.json`.
 4. Run both suites and the contract tests.

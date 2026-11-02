@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from ucits_etf_holdings import Fund, Holding, look_through
+from ucits_etf_issuer_holdings import Fund, Holding, look_through
 
 
 def fund(isin: str, rows: list[tuple[str, float, str | None]]) -> Fund:

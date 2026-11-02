@@ -6,10 +6,11 @@ Runs offline on the recorded transport; drop `transport=` to fetch the issuer's 
 import csv
 import sys
 
-from ucits_etf_holdings import get_holdings
-from ucits_etf_holdings.testing import recorded_transport
+from ucits_etf_issuer_holdings import get_holdings
+from ucits_etf_issuer_holdings.testing import recorded_transport
 
-fund = get_holdings("IE00B5M1WJ87", transport=recorded_transport())  # SPDR Euro Dividend Aristocrats
+# SPDR S&P Euro Dividend Aristocrats
+fund = get_holdings("IE00B5M1WJ87", transport=recorded_transport())
 
 writer = csv.writer(sys.stdout)
 writer.writerow(["name", "isin", "weight", "country", "sector", "currency"])

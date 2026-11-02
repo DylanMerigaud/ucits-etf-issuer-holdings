@@ -6,9 +6,9 @@ from typing import Any
 import httpx
 import pytest
 
-from ucits_etf_holdings import __version__
-from ucits_etf_holdings.errors import TransportError
-from ucits_etf_holdings.http import CachingTransport, HttpxTransport, Response, Transport
+from ucits_etf_issuer_holdings import __version__
+from ucits_etf_issuer_holdings.errors import TransportError
+from ucits_etf_issuer_holdings.http import CachingTransport, HttpxTransport, Response, Transport
 
 
 def test_response_text_and_json() -> None:

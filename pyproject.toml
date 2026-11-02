@@ -36,13 +36,13 @@ Repository = "https://github.com/DylanMerigaud/ucits-etf-issuer-holdings"
 Issues = "https://github.com/DylanMerigaud/ucits-etf-issuer-holdings/issues"
 
 [project.scripts]
-ucits-holdings = "ucits_etf_holdings.cli:main"
+ucits-holdings = "ucits_etf_issuer_holdings.cli:main"
 
 [dependency-groups]
 dev = ["pytest>=8", "jsonschema>=4", "mypy>=1.10", "ruff>=0.5", "httpx[socks]>=0.27"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/ucits_etf_holdings"]
+packages = ["src/ucits_etf_issuer_holdings"]
 
 [tool.hatch.build.targets.sdist]
 include = ["src", "tests", "schema", "docs", "LICENSE", "README.md", "pyproject.toml", "ruff.toml"]

@@ -5,10 +5,10 @@ from pathlib import Path
 import pytest
 from stubs import StaticTransport
 
-from ucits_etf_holdings import Fund, HoldingsClient, get_holdings
-from ucits_etf_holdings.errors import FundNotFound, InvalidISIN, TransportError
-from ucits_etf_holdings.http import CachingTransport, Response
-from ucits_etf_holdings.testing import RECORDED_ISINS, RecordedTransport, recorded_transport
+from ucits_etf_issuer_holdings import Fund, HoldingsClient, get_holdings
+from ucits_etf_issuer_holdings.errors import FundNotFound, InvalidISIN, TransportError
+from ucits_etf_issuer_holdings.http import CachingTransport, Response
+from ucits_etf_issuer_holdings.testing import RECORDED_ISINS, RecordedTransport, recorded_transport
 
 
 def client(**kw: object) -> HoldingsClient:

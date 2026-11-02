@@ -5,10 +5,10 @@ from typing import Any
 import pytest
 from stubs import RewritingTransport, with_json
 
-from ucits_etf_holdings.errors import IssuerUnavailable, NotListed
-from ucits_etf_holdings.http import Response
-from ucits_etf_holdings.issuers.vanguard import VanguardIssuer
-from ucits_etf_holdings.testing import RecordedTransport, recorded_transport
+from ucits_etf_issuer_holdings.errors import IssuerUnavailable, NotListed
+from ucits_etf_issuer_holdings.http import Response
+from ucits_etf_issuer_holdings.issuers.vanguard import VanguardIssuer
+from ucits_etf_issuer_holdings.testing import RecordedTransport, recorded_transport
 
 
 def test_fund_with_two_pages() -> None:

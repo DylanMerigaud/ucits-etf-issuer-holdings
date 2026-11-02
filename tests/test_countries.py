@@ -1,4 +1,4 @@
-from ucits_etf_holdings.countries import name_of, to_iso2
+from ucits_etf_issuer_holdings.countries import name_of, to_iso2
 
 
 def test_codes_pass_through() -> None:
