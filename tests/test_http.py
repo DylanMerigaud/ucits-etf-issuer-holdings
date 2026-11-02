@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from pathlib import Path
 from typing import Any
 
@@ -173,3 +174,93 @@ def test_no_stale_copy_means_the_error_propagates(tmp_path: Path) -> None:
 def test_protocol_is_satisfied() -> None:
     transport: Transport = FakeTransport([])
     assert transport is not None
+
+
+@pytest.mark.parametrize("status", [403, 408, 429, 500, 503])
+def test_stale_copy_on_refusal_timeout_rate_limit_and_server_error(
+    tmp_path: Path, status: int
+) -> None:
+    clock = Clock()
+    inner = FakeTransport([ok("old"), Response(status, b"x", "text/plain", "u")])
+    cache = CachingTransport(inner, tmp_path, clock=clock)
+    cache.request("GET", "https://x/a", ttl=60)
+    clock.now += 600
+    resp = cache.request("GET", "https://x/a", ttl=60)
+    assert (resp.text, resp.stale) == ("old", True)
+
+
+def test_no_stale_copy_on_404(tmp_path: Path) -> None:
+    clock = Clock()
+    inner = FakeTransport([ok("old"), Response(404, b"gone", "text/plain", "u")])
+    cache = CachingTransport(inner, tmp_path, clock=clock)
+    cache.request("GET", "https://x/a", ttl=60)
+    clock.now += 600
+    assert cache.request("GET", "https://x/a", ttl=60).status == 404
+
+
+def reject_bad(response: Response) -> None:
+    if response.text == "bad":
+        raise ValueError("cannot parse")
+
+
+def test_answer_the_validator_rejects_is_not_cached(tmp_path: Path) -> None:
+    clock = Clock()
+    inner = FakeTransport([ok("good"), ok("bad"), ok("good again")])
+    cache = CachingTransport(inner, tmp_path, clock=clock)
+    cache.request("GET", "https://x/a", ttl=60, validate=reject_bad)
+    clock.now += 600
+    served = cache.request("GET", "https://x/a", ttl=60, validate=reject_bad)
+    assert (served.text, served.stale) == ("good", True)
+    assert served.stored_at == 1000.0
+    # the previous copy is still the one on disk, and still expired: the next call asks again
+    assert cache.request("GET", "https://x/a", ttl=60, validate=reject_bad).text == "good again"
+    assert inner.calls == 3
+
+
+def test_rejected_answer_without_previous_copy_is_returned_uncached(tmp_path: Path) -> None:
+    inner = FakeTransport([ok("bad"), ok("bad")])
+    cache = CachingTransport(inner, tmp_path)
+    first = cache.request("GET", "https://x/a", ttl=60, validate=reject_bad)
+    assert (first.text, first.stale) == ("bad", False)
+    cache.request("GET", "https://x/a", ttl=60, validate=reject_bad)
+    assert inner.calls == 2
+    assert not list(tmp_path.glob("*.cache"))
+
+
+def test_one_file_per_key_and_no_temp_left(tmp_path: Path) -> None:
+    cache = CachingTransport(FakeTransport([ok("one")]), tmp_path)
+    cache.request("GET", "https://x/a", ttl=60)
+    names = [p.name for p in tmp_path.iterdir()]
+    assert len(names) == 1 and names[0].endswith(".cache")
+
+
+def test_a_corrupt_cache_file_is_a_miss(tmp_path: Path) -> None:
+    clock = Clock()
+    inner = FakeTransport([ok("one"), ok("two")])
+    cache = CachingTransport(inner, tmp_path, clock=clock)
+    cache.request("GET", "https://x/a", ttl=60)
+    (path,) = tmp_path.glob("*.cache")
+    path.write_bytes(b"not json at all")
+    assert cache.request("GET", "https://x/a", ttl=60).text == "two"
+
+
+def test_stored_at_is_the_store_time_for_a_cached_copy(tmp_path: Path) -> None:
+    clock = Clock()
+    cache = CachingTransport(FakeTransport([ok("one")]), tmp_path, clock=clock)
+    cache.request("GET", "https://x/a", ttl=60)
+    clock.now += 30
+    assert cache.request("GET", "https://x/a", ttl=60).stored_at == 1000.0
+
+
+def test_live_response_stored_at_is_now() -> None:
+    before = time.time()
+    assert Response(200, b"", "t", "u").stored_at >= before
+
+
+def test_httpx_transport_closes_only_its_own_client() -> None:
+    own = HttpxTransport()
+    own.close()
+    assert own._client.is_closed
+    client = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(200)))
+    HttpxTransport(client=client).close()
+    assert not client.is_closed

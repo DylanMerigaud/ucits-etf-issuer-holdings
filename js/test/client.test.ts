@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readdir } from "node:fs/promises";
+import { mkdtemp, readdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -205,4 +205,98 @@ test("response: text drops a BOM, json parses", () => {
   const r = new HttpResponse(200, new Uint8Array([0xef, 0xbb, 0xbf, 0x7b, 0x7d]), "application/json", "u");
   assert.equal(r.text, "{}");
   assert.deepEqual(r.json(), {});
+});
+
+const answer = (status: number, body = "x") => new HttpResponse(status, new TextEncoder().encode(body), "text/plain", "u");
+
+test("caching: stale copy on 403, 408, 429, 500, 503; none on 404", async () => {
+  for (const status of [403, 408, 429, 500, 503]) {
+    let now = 1000;
+    const cache = new CachingTransport(new Script([ok("old"), answer(status)]), await tmp(), () => now);
+    await cache.request("GET", "https://x/a", { ttl: 60 });
+    now += 600;
+    const resp = await cache.request("GET", "https://x/a", { ttl: 60 });
+    assert.deepEqual([resp.text, resp.stale], ["old", true], `status ${status}`);
+  }
+  let now = 1000;
+  const cache = new CachingTransport(new Script([ok("old"), answer(404)]), await tmp(), () => now);
+  await cache.request("GET", "https://x/a", { ttl: 60 });
+  now += 600;
+  assert.equal((await cache.request("GET", "https://x/a", { ttl: 60 })).status, 404);
+});
+
+const rejectBad = (r: HttpResponse) => {
+  if (r.text === "bad") throw new Error("cannot parse");
+};
+
+test("caching: an answer the validator rejects is not kept; the previous copy is served stale", async () => {
+  let now = 1000;
+  const inner = new Script([ok("good"), ok("bad"), ok("good again")]);
+  const cache = new CachingTransport(inner, await tmp(), () => now);
+  await cache.request("GET", "https://x/a", { ttl: 60, validate: rejectBad });
+  now += 600;
+  const served = await cache.request("GET", "https://x/a", { ttl: 60, validate: rejectBad });
+  assert.deepEqual([served.text, served.stale, served.storedAt], ["good", true, 1000]);
+  assert.equal((await cache.request("GET", "https://x/a", { ttl: 60, validate: rejectBad })).text, "good again");
+  assert.equal(inner.calls, 3);
+});
+
+test("caching: a rejected answer without a previous copy is returned uncached", async () => {
+  const dir = await tmp();
+  const inner = new Script([ok("bad"), ok("bad")]);
+  const cache = new CachingTransport(inner, dir);
+  const first = await cache.request("GET", "https://x/a", { ttl: 60, validate: rejectBad });
+  assert.deepEqual([first.text, first.stale], ["bad", false]);
+  await cache.request("GET", "https://x/a", { ttl: 60, validate: rejectBad });
+  assert.equal(inner.calls, 2);
+  assert.deepEqual(await readdir(dir), []);
+});
+
+test("caching: one file per key, no temporary file left, a corrupt file is a miss", async () => {
+  const dir = await tmp();
+  const cache = new CachingTransport(new Script([ok("one"), ok("two")]), dir);
+  await cache.request("GET", "https://x/a", { ttl: 60 });
+  const names = await readdir(dir);
+  assert.equal(names.length, 1);
+  assert.ok(names[0]!.endsWith(".cache"));
+  await writeFile(join(dir, names[0]!), "not json at all");
+  assert.equal((await cache.request("GET", "https://x/a", { ttl: 60 })).text, "two");
+});
+
+test("caching: storedAt of a cached copy is the store time", async () => {
+  let now = 1000;
+  const cache = new CachingTransport(new Script([ok("one")]), await tmp(), () => now);
+  await cache.request("GET", "https://x/a", { ttl: 60 });
+  now += 30;
+  assert.equal((await cache.request("GET", "https://x/a", { ttl: 60 })).storedAt, 1000);
+  assert.ok(ok().storedAt >= Date.now() / 1000 - 5);
+});
+
+test("caching: concurrent identical requests share one download", async () => {
+  let calls = 0;
+  const slow = {
+    async request(): Promise<HttpResponse> {
+      calls += 1;
+      await new Promise((r) => setTimeout(r, 20));
+      return ok("shared");
+    },
+  };
+  const cache = new CachingTransport(slow, await tmp());
+  const answers = await Promise.all([1, 2, 3].map(() => cache.request("GET", "https://x/a", { ttl: 60 })));
+  assert.deepEqual(answers.map((a) => a.text), ["shared", "shared", "shared"]);
+  assert.equal(calls, 1);
+});
+
+test("caching: a cache file the Python package wrote is served", async () => {
+  const dir = await tmp();
+  const cache = new CachingTransport(new Script([]), dir, () => 1010);
+  // key and file as written by the Python CachingTransport for this request
+  const key = "d79deda7d3c53886fc2a59802d1083f5a198175471232d8079e8466ef9eb9f48";
+  await writeFile(join(dir, `${key}.cache`), '{"stored_at": 1000.5, "content_type": "text/plain", "url": "https://x/a"}\nbody');
+  const served = await cache.request("POST", "https://x/a", {
+    params: { b: "2", a: "1" },
+    json: { k: "\u00e9", a: [1, 2.5, null] },
+    ttl: 60,
+  });
+  assert.deepEqual([served.text, served.storedAt, served.url, served.stale], ["body", 1000.5, "https://x/a", false]);
 });
