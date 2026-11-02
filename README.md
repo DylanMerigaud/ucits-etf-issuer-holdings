@@ -19,6 +19,9 @@ pip install ucits-etf-issuer-holdings        # Python 3.10+
 npm install ucits-etf-issuer-holdings        # Node 20+, no runtime dependency
 ```
 
+The TypeScript package runs on Node.js 20 or later only: it reads the cache and the xlsx files
+with `node:fs`, `node:zlib` and `node:crypto`, so it does not run in a browser or a webview.
+
 ## Quickstart
 
 <!-- harness: skip -->
@@ -71,8 +74,9 @@ for country, amount in look_through(positions, funds, by="country")[:5]:
     print(country, round(amount, 2))
 ```
 
-`by` is one of `country`, `sector`, `currency`, `asset_class`. Each position is spread over its
-fund's holdings by weight.
+`by` is one of `country`, `sector`, `currency`, `asset_class`, or `isin` for a single-name
+concentration (a line without an ISIN, such as Vanguard's, is counted under its name). Each
+position is spread over its fund's holdings by weight.
 
 ### TypeScript
 
@@ -112,26 +116,32 @@ ucits-holdings IE00B4L5Y983 --by country --format csv > exposure.csv
   "holdings": [
     {"name": "APPLE", "weight": 5.6239, "isin": "US0378331005", "ticker": "AAPL",
      "country": "US", "country_name": "United States", "sector": "Information Technology",
-     "currency": "USD", "asset_class": "Equity"}
+     "currency": "USD", "asset_class": "equity", "asset_class_raw": "Equity"}
   ]
 }
 ```
 
 `weight` is a percent of the fund. `country` is an ISO 3166 alpha-2 code mapped from the
-issuer's own country column (country of risk where the issuer says so). A field the issuer does
-not publish is `null`, never guessed.
+issuer's own country column (country of risk where the issuer says so). `asset_class` is one of
+`equity`, `fixed_income`, `cash`, `derivative`, `fund`, `real_estate`, `commodity` or `other`
+(a label the library does not know yet), mapped from the issuer's own label, which
+`asset_class_raw` keeps as published. `as_of` is the date of the holdings, `fetched_at` the time
+the issuer's file was downloaded (for a cached copy, when it was stored). A field the issuer
+does not publish is `null`, never guessed.
 
-| Issuer | Found by | Holdings file | Fields the issuer gives | Updated |
+| Issuer | Found by | Holdings file | What the issuer does not give | Updated |
 |---|---|---|---|---|
-| iShares | fund list of the German site | product data API | all | daily |
-| Vanguard | fund list of the German site | GraphQL API, paged | no ISIN or currency per line | month end |
-| Xtrackers | ISIN | xlsx export | no fund name | daily |
-| Amundi | ISIN | product data API | all | daily |
-| SPDR | fund list of the German site | xlsx export | all | daily |
-| Invesco | ISIN | holdings API | no country or sector, no fund name | daily |
+| iShares | fund list of the German site | product data API | nothing: every field is filled | daily |
+| Vanguard | fund list of the German site | GraphQL API, paged | ISIN and currency per line | month end |
+| Xtrackers | ISIN | xlsx export | ticker per line; fund name, fund currency | daily |
+| Amundi | ISIN | product data API | ticker per line | daily |
+| SPDR | fund list of the German site | xlsx export | ticker and asset class per line; fund currency | daily |
+| Invesco | ISIN | holdings API | ticker, country, sector and asset class per line; fund name, fund currency | daily |
 
-Measured on 2026-11-02 on one large fund per issuer: the weights sum to 99 to 100 percent, and a
-country is known for 92 to 100 percent of the weight (Invesco: none, the file has no country).
+On 2026-11-02, through a proxy, [`scripts/measure_coverage.py`](scripts/measure_coverage.py)
+fetched one large fund per issuer (the contract test funds): the weights sum to 99.0 to 100
+percent, and every issuer that publishes a country gives one for 100 percent of the weight
+(Invesco's file has no country). Run it again to check today's files.
 
 ## Errors and caching
 
@@ -140,8 +150,13 @@ country is known for 92 to 100 percent of the weight (Invesco: none, the file ha
   fund is not theirs (`NotListed`) or the issuer could not be asked (`IssuerUnavailable`, with
   what it answered).
 - Fund lists are cached for a day and holdings for six hours under `~/.cache/ucits-etf-issuer-holdings`
-  (`cache_dir=None` turns it off). When an issuer is down and an older copy exists, you get that
-  copy with `fund.stale == True` rather than an error.
+  (`cache_dir=None` turns it off; a transport you pass is not cached unless you also pass a
+  `cache_dir`). An answer is kept only when it parses, so a broken file never replaces a good
+  copy. When an issuer is down, refuses (403), times out (408), rate limits (429) or answers
+  with something the library cannot read, and an older copy exists, you get that copy with
+  `fund.stale == True` rather than an error.
+- `HoldingsClient` is a context manager (`with HoldingsClient() as client:`), or call
+  `client.close()`, to release its connections.
 - Proxies: the Python client reads `HTTPS_PROXY` and `ALL_PROXY` (install `httpx[socks]` for SOCKS).
 
 Issuers change their sites without notice. A contract test fetches one real fund per issuer
@@ -163,8 +178,10 @@ as a red badge the same day.
 
 The usual workaround is a hand-kept map of issuer endpoints inside each app (see
 [Aurelio's issuers.py](https://github.com/LosaLosSantos/aurelio-finance/blob/main/backend/app/issuers.py)).
-This library is that map, shared, tested every day, in the two languages the trackers are
-written in.
+This library is that map, shared and tested every day, in Python (Aurelio's language) and
+TypeScript (Ghostfolio's). Trackers that cannot load either package, such as Wealthfolio (a Rust
+core with a webview front end) or Portfolio Performance (Java), can call the `ucits-holdings`
+command line.
 
 ## Plugging it into a tracker
 
@@ -184,7 +201,7 @@ async function countryProfile(isin: string) {
 ```
 
 The same pattern gives sectors (`"sector"`) or a single-name concentration across a portfolio
-(`look_through(..., by=...)` in Python, `lookThrough` in TypeScript). Open requests this answers:
+(`look_through(..., by="isin")` in Python, `lookThrough(..., "isin")` in TypeScript). Open requests this answers:
 [Ghostfolio #5924](https://github.com/ghostfolio/ghostfolio/issues/5924) (ETF country and holdings
 data), [Wealthfolio #827](https://github.com/wealthfolio/wealthfolio/issues/827) (UCITS
 look-through), [Portfolio Performance #1665](https://github.com/portfolio-performance/portfolio/issues/1665)
