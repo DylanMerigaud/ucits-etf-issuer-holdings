@@ -6,17 +6,18 @@ import { HoldingsClient, totalWeight } from "../dist/index.js";
 
 const live = process.env["UCITS_HOLDINGS_LIVE"] === "1";
 
-// [isin, issuer, whether the issuer gives a country per line]
-const FUNDS: Array<[string, string, boolean]> = [
-  ["IE00B4L5Y983", "ishares", true],
-  ["IE00BK5BQT80", "vanguard", true],
-  ["IE00BJ0KDQ92", "xtrackers", true],
-  ["IE000BI8OT95", "amundi", true],
-  ["IE00B5M1WJ87", "spdr", true],
-  ["IE000716YHJ7", "invesco", false],
+// [isin, issuer, whether the issuer gives a country per line, oldest as-of date accepted in days]
+// Vanguard publishes month-end holdings, so its file can be a month and a half old.
+const FUNDS: Array<[string, string, boolean, number]> = [
+  ["IE00B4L5Y983", "ishares", true, 45],
+  ["IE00BK5BQT80", "vanguard", true, 75],
+  ["IE00BJ0KDQ92", "xtrackers", true, 45],
+  ["IE000BI8OT95", "amundi", true, 45],
+  ["IE00B5M1WJ87", "spdr", true, 45],
+  ["IE000716YHJ7", "invesco", false, 45],
 ];
 
-for (const [isin, issuer, hasCountry] of FUNDS) {
+for (const [isin, issuer, hasCountry, maxAge] of FUNDS) {
   test(`live: ${issuer} ${isin}`, { skip: live ? false : "set UCITS_HOLDINGS_LIVE=1", timeout: 120_000 }, async () => {
     const fund = await new HoldingsClient({ cacheDir: null }).get(isin, { issuer });
     assert.equal(fund.issuer, issuer);
@@ -25,7 +26,7 @@ for (const [isin, issuer, hasCountry] of FUNDS) {
     assert.ok(total >= 90 && total <= 110, `total weight ${total}`);
     assert.ok(fund.as_of !== null);
     const age = (Date.now() - Date.parse(`${fund.as_of}T00:00:00Z`)) / 86_400_000;
-    assert.ok(age >= -1 && age <= 45, `as_of ${fund.as_of} is ${age} days old`);
+    assert.ok(age >= -1 && age <= maxAge, `as_of ${fund.as_of} is ${age} days old`);
     if (hasCountry) {
       const withCountry = fund.holdings.filter((h) => h.country).reduce((s, h) => s + h.weight, 0);
       assert.ok(withCountry >= 0.8 * total, `country coverage ${withCountry} of ${total}`);

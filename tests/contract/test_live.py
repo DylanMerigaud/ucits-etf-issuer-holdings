@@ -19,26 +19,28 @@ pytestmark = [
     ),
 ]
 
-# (isin, issuer, whether the issuer gives a country per line)
+# (isin, issuer, whether the issuer gives a country per line, oldest as-of date accepted in days)
+# Vanguard publishes month-end holdings, so its file can be a month and a half old.
 FUNDS = [
-    ("IE00B4L5Y983", "ishares", True),
-    ("IE00BK5BQT80", "vanguard", True),
-    ("IE00BJ0KDQ92", "xtrackers", True),
-    ("IE000BI8OT95", "amundi", True),
-    ("IE00B5M1WJ87", "spdr", True),
-    ("IE000716YHJ7", "invesco", False),
+    ("IE00B4L5Y983", "ishares", True, 45),
+    ("IE00BK5BQT80", "vanguard", True, 75),
+    ("IE00BJ0KDQ92", "xtrackers", True, 45),
+    ("IE000BI8OT95", "amundi", True, 45),
+    ("IE00B5M1WJ87", "spdr", True, 45),
+    ("IE000716YHJ7", "invesco", False, 45),
 ]
 
 
-@pytest.mark.parametrize(("isin", "issuer", "has_country"), FUNDS)
-def test_large_fund(isin: str, issuer: str, has_country: bool) -> None:
-    fund = HoldingsClient(cache_dir=None).get(isin, issuer=issuer)
+@pytest.mark.parametrize(("isin", "issuer", "has_country", "max_age"), FUNDS)
+def test_large_fund(isin: str, issuer: str, has_country: bool, max_age: int) -> None:
+    with HoldingsClient(cache_dir=None) as client:
+        fund = client.get(isin, issuer=issuer)
     assert fund.issuer == issuer
     assert len(fund.holdings) >= 20
     assert 90 <= fund.total_weight <= 110
     assert fund.as_of is not None
     age = (date.today() - datetime.strptime(fund.as_of, "%Y-%m-%d").date()).days
-    assert -1 <= age <= 45
+    assert -1 <= age <= max_age, f"as_of {fund.as_of} is {age} days old"
     if has_country:
         with_country = sum(h.weight for h in fund.holdings if h.country)
         assert with_country >= 0.8 * fund.total_weight
