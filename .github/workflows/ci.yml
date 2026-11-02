@@ -23,6 +23,7 @@ jobs:
       - run: uv run mypy
       - run: uv run pytest
       - run: uv run python examples/look_through.py
+      - run: uv run python examples/export_csv.py
       - run: uv build
 
   typescript:
@@ -39,6 +40,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
+      # uv lets the parity test run the Python package live, not only against the snapshot
+      - uses: astral-sh/setup-uv@v6
       - run: npm ci
       - run: npm run build
       - run: npm test
