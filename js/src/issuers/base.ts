@@ -1,5 +1,5 @@
 import { nameOf, toIso2 } from "../countries.js";
-import { IssuerUnavailable, NotListed, TransportError } from "../errors.js";
+import { AccessDenied, IssuerUnavailable, NotListed, TransportError } from "../errors.js";
 import type { HttpResponse, RequestOptions, Transport } from "../http.js";
 import { makeHoldingObject, type Fund, type Holding } from "../models.js";
 import { normalizeAssetClass } from "./assetClasses.js";
@@ -162,11 +162,17 @@ export async function fetchParsed<T>(
   return [response, parse(response)];
 }
 
-/** The parsed JSON of a 200 answer; anything else is IssuerUnavailable. */
-export function okJson(issuer: string, response: HttpResponse): unknown {
+/** Throw unless the answer is a 200: AccessDenied for a 403, IssuerUnavailable otherwise. */
+export function requireOk(issuer: string, response: HttpResponse): void {
+  if (response.status === 403) throw new AccessDenied(issuer, response.url);
   if (response.status !== 200) {
     throw new IssuerUnavailable(issuer, `HTTP ${response.status} from ${response.url}`);
   }
+}
+
+/** The parsed JSON of a 200 answer; a 403 is AccessDenied, anything else IssuerUnavailable. */
+export function okJson(issuer: string, response: HttpResponse): unknown {
+  requireOk(issuer, response);
   try {
     return response.json();
   } catch {

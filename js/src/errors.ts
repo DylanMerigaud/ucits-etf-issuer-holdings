@@ -40,17 +40,50 @@ export class IssuerUnavailable extends HoldingsError {
   }
 }
 
-/** No issuer answered with holdings; `reasons` says why each one did not. */
+/**
+ * The issuer's site refused this network address (HTTP 403 before any data).
+ *
+ * iShares (BlackRock) serves its site through Akamai, which refuses most cloud and datacenter
+ * address ranges whatever the request looks like, so the same call that works from a home
+ * connection fails from a server or a CI runner. `url` is the address that refused.
+ */
+export class AccessDenied extends IssuerUnavailable {
+  readonly url: string;
+
+  constructor(issuer: string, url: string) {
+    super(
+      issuer,
+      `HTTP 403 from ${url}: the site refused this network address (its CDN blocks most ` +
+        "cloud and datacenter IP ranges, whatever the request headers); run from a " +
+        "residential connection or send the requests through a proxy on one (README, " +
+        "'Blocked by an issuer')",
+    );
+    this.url = url;
+  }
+}
+
+/**
+ * No issuer answered with holdings; `reasons` says why each one did not.
+ *
+ * `blocked` names the issuers that refused this network address ({@link AccessDenied}): the
+ * fund may be theirs, the library could not ask.
+ */
 export class FundNotFound extends HoldingsError {
   readonly isin: string;
   readonly reasons: Record<string, string>;
+  readonly blocked: readonly string[];
 
-  constructor(isin: string, reasons: Record<string, string>) {
+  constructor(isin: string, reasons: Record<string, string>, blocked: readonly string[] = []) {
     const detail = Object.entries(reasons)
       .map(([name, why]) => `${name}: ${why}`)
       .join("; ");
-    super(`${isin}: no issuer returned holdings (${detail})`);
+    const lead = blocked.length > 0
+      ? `${isin}: no issuer returned holdings, and ${blocked.join(", ")} refused this network ` +
+        "address, so the fund may be theirs"
+      : `${isin}: no issuer returned holdings`;
+    super(`${lead} (${detail})`);
     this.isin = isin;
     this.reasons = reasons;
+    this.blocked = blocked;
   }
 }

@@ -7,7 +7,7 @@ from enum import Enum
 from pathlib import Path
 from types import TracebackType
 
-from .errors import FundNotFound, HoldingsError, IssuerUnavailable, NotListed
+from .errors import AccessDenied, FundNotFound, HoldingsError, IssuerUnavailable, NotListed
 from .http import DEFAULT_CACHE_DIR, CachingTransport, HttpxTransport, Transport
 from .isin import normalize
 from .issuers import ISSUERS, ORDER
@@ -23,7 +23,8 @@ class _Default(Enum):
 class HoldingsClient:
     """Fetches the holdings an issuer publishes for an ISIN.
 
-    With no `transport` the client uses httpx and an on-disk cache in `DEFAULT_CACHE_DIR`.
+    With no `transport` the client uses httpx and an on-disk cache in `DEFAULT_CACHE_DIR`;
+    `proxy` then sends every request through that proxy URL (see `HttpxTransport`).
     A transport you pass is used as it is, without a cache, unless you also pass a `cache_dir`
     (any directory, the default one included). `cache_dir=None` never caches.
 
@@ -36,7 +37,10 @@ class HoldingsClient:
         cache_dir: str | Path | _Default | None = _Default.CACHE_DIR,
         issuers: Iterable[str] | None = None,
         timeout: float = 30.0,
+        proxy: str | None = None,
     ) -> None:
+        if transport is not None and proxy is not None:
+            raise ValueError("proxy= applies to the default transport; pass one or the other")
         names = tuple(issuers) if issuers is not None else ORDER
         unknown = [name for name in names if name not in ISSUERS]
         if unknown:
@@ -45,7 +49,7 @@ class HoldingsClient:
         self._own: HttpxTransport | None = None
         base: Transport
         if transport is None:
-            self._own = base = HttpxTransport(timeout=timeout)
+            self._own = base = HttpxTransport(timeout=timeout, proxy=proxy)
         else:
             base = transport
         if cache_dir is _Default.CACHE_DIR:
@@ -75,7 +79,8 @@ class HoldingsClient:
         """Return the fund for `isin`, asking only `issuer` when given.
 
         Raises `InvalidISIN`, `ValueError` for an unknown issuer name, or `FundNotFound` when no
-        issuer answered with holdings.
+        issuer answered with holdings (its `blocked` names the issuers whose site refused this
+        network address).
         """
         code = normalize(isin)
         if issuer is not None:
@@ -85,9 +90,14 @@ class HoldingsClient:
         else:
             names = self._names
         reasons: dict[str, str] = {}
+        blocked: list[str] = []
         for name in names:
             try:
                 fund = ISSUERS[name].fetch(code, self._http)
+            except AccessDenied as exc:
+                reasons[name] = exc.reason
+                blocked.append(name)
+                continue
             except (NotListed, IssuerUnavailable) as exc:
                 reasons[name] = exc.reason
                 continue
@@ -97,7 +107,7 @@ class HoldingsClient:
                 reasons[name] = f"unexpected answer: {type(exc).__name__}: {exc}"
                 continue
             return fund
-        raise FundNotFound(code, reasons)
+        raise FundNotFound(code, reasons, tuple(blocked))
 
 
 def get_holdings(
@@ -107,7 +117,10 @@ def get_holdings(
     transport: Transport | None = None,
     cache_dir: str | Path | _Default | None = _Default.CACHE_DIR,
     timeout: float = 30.0,
+    proxy: str | None = None,
 ) -> Fund:
     """One-call form of `HoldingsClient(...).get(isin, issuer)`; the client is closed after."""
-    with HoldingsClient(transport=transport, cache_dir=cache_dir, timeout=timeout) as client:
+    with HoldingsClient(
+        transport=transport, cache_dir=cache_dir, timeout=timeout, proxy=proxy
+    ) as client:
         return client.get(isin, issuer)

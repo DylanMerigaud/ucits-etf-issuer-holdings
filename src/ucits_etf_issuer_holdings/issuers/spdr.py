@@ -19,6 +19,7 @@ from .base import (
     number,
     ok_json,
     require_holdings,
+    require_ok,
     text,
 )
 
@@ -89,8 +90,7 @@ def _find_fund(funds: list[Any], isin: str) -> tuple[str | None, str] | None:
 
 def _parse_holdings(response: Response) -> tuple[dict[str, Any], tuple[Holding, ...]]:
     """The labelled cells above the table (`Fund Name:` ...) and the holdings."""
-    if response.status != 200:
-        raise IssuerUnavailable("spdr", f"HTTP {response.status} from {response.url}")
+    require_ok("spdr", response)
     try:
         _, rows = read_sheet(response.content)
     except ValueError as exc:

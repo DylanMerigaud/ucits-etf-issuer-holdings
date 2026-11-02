@@ -9,7 +9,7 @@ from typing import Any, Protocol, TypeVar
 from urllib.parse import urlencode
 
 from .. import countries
-from ..errors import IssuerUnavailable, NotListed, TransportError
+from ..errors import AccessDenied, IssuerUnavailable, NotListed, TransportError
 from ..http import CachingTransport, Response, Transport, Validate
 from ..models import Fund, Holding
 from .asset_classes import normalize_asset_class
@@ -204,10 +204,17 @@ def fetch_parsed(
     return response, parse(response)
 
 
-def ok_json(issuer: str, response: Response) -> Any:
-    """The parsed JSON of a 200 answer; anything else is IssuerUnavailable."""
+def require_ok(issuer: str, response: Response) -> None:
+    """Raise unless the answer is a 200: AccessDenied for a 403, IssuerUnavailable otherwise."""
+    if response.status == 403:
+        raise AccessDenied(issuer, response.url)
     if response.status != 200:
         raise IssuerUnavailable(issuer, f"HTTP {response.status} from {response.url}")
+
+
+def ok_json(issuer: str, response: Response) -> Any:
+    """The parsed JSON of a 200 answer; a 403 is AccessDenied, anything else IssuerUnavailable."""
+    require_ok(issuer, response)
     try:
         return response.json()
     except ValueError as exc:

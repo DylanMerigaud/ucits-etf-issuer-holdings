@@ -28,7 +28,7 @@ with `node:fs`, `node:zlib` and `node:crypto`, so it does not run in a browser o
 ```python
 from ucits_etf_issuer_holdings import get_holdings
 
-fund = get_holdings("IE00B4L5Y983")  # iShares Core MSCI World
+fund = get_holdings("IE00BK5BQT80")  # Vanguard FTSE All-World
 print(fund.fund_name, fund.as_of, len(fund.holdings))
 for h in fund.top(3):
     print(f"{h.weight:6.2f}  {h.country}  {h.name}")
@@ -36,15 +36,16 @@ print(fund.weights_by("country")[:3])
 ```
 
 ```text
-iShares Core MSCI World UCITS ETF 2026-10-30 1271
-  5.62  US  APPLE
-  5.23  US  NVIDIA
-  4.09  US  MICROSOFT
-[('US', 72.63149), ('JP', 5.74119), ('GB', 3.50965)]
+Vanguard FTSE All-World UCITS ETF (USD) Accumulating 2026-09-30 4235
+  5.01  US  NVIDIA Corp
+  4.52  US  Apple Inc
+  3.58  US  Microsoft Corp
+[('US', 62.28004), ('JP', 6.05742), ('TW', 3.53726)]
 ```
 
-You do not need to know the issuer: the client asks each one in turn. Pass `issuer="ishares"`
-to ask one directly.
+You do not need to know the issuer: the client asks each one in turn. Pass `issuer="vanguard"`
+to ask one directly. iShares funds need a home connection or a proxy: iShares refuses most
+cloud and datacenter addresses (see [Blocked by an issuer](#blocked-by-an-issuer)).
 
 ### Try it offline
 
@@ -98,7 +99,8 @@ The objects are the same JSON as Python's `fund.to_dict()`, described by
 <!-- harness: skip -->
 ```sh
 ucits-holdings IE00B5M1WJ87 --format table
-ucits-holdings IE00B4L5Y983 --by country --format csv > exposure.csv
+ucits-holdings IE00BK5BQT80 --by country --format csv > exposure.csv
+ucits-holdings IE00B4L5Y983 --proxy http://user:pass@proxy.example:8080  # iShares from a server
 ```
 
 ## What you get
@@ -131,12 +133,13 @@ does not publish is `null`, never guessed.
 
 | Issuer | Found by | Holdings file | What the issuer does not give | Updated |
 |---|---|---|---|---|
-| iShares | fund list of the German site | product data API | nothing: every field is filled | daily |
+| iShares | fund list of the German site | product data API | nothing: every field is filled; refuses most cloud and datacenter addresses ([below](#blocked-by-an-issuer)) | daily |
 | Vanguard | fund list of the German site | GraphQL API, paged | ISIN and currency per line | month end |
 | Xtrackers | ISIN | xlsx export | ticker per line; fund name, fund currency | daily |
 | Amundi | ISIN | product data API | ticker per line | daily |
 | SPDR | fund list of the German site | xlsx export | ticker and asset class per line; fund currency | daily |
 | Invesco | ISIN | holdings API | ticker, country, sector and asset class per line; fund name, fund currency | daily |
+| UBS | not covered | none found | its product pages (`ubs.com/<country>/<lang>/assetmanagement/funds/etf/<isin>.html`) load the fund in the browser and offer no public holdings file we could find (checked 2026-11-02); the free sites we checked show its top 10 only | |
 
 On 2026-11-02, through a proxy, [`scripts/measure_coverage.py`](scripts/measure_coverage.py)
 fetched one large fund per issuer (the contract test funds): the weights sum to 99.0 to 100
@@ -148,7 +151,8 @@ percent, and every issuer that publishes a country gives one for 100 percent of 
 - `InvalidISIN`: the check digit or the shape is wrong.
 - `FundNotFound`: no issuer answered with holdings. Its `reasons` say, per issuer, whether the
   fund is not theirs (`NotListed`) or the issuer could not be asked (`IssuerUnavailable`, with
-  what it answered).
+  what it answered). Its `blocked` names the issuers whose site refused your address
+  (`AccessDenied`, below): the fund may be theirs.
 - Fund lists are cached for a day and holdings for six hours under `~/.cache/ucits-etf-issuer-holdings`
   (`cache_dir=None` turns it off; a transport you pass is not cached unless you also pass a
   `cache_dir`). An answer is kept only when it parses, so a broken file never replaces a good
@@ -157,7 +161,26 @@ percent, and every issuer that publishes a country gives one for 100 percent of 
   `fund.stale == True` rather than an error.
 - `HoldingsClient` is a context manager (`with HoldingsClient() as client:`), or call
   `client.close()`, to release its connections.
-- Proxies: the Python client reads `HTTPS_PROXY` and `ALL_PROXY` (install `httpx[socks]` for SOCKS).
+- Proxies: `HoldingsClient(proxy="http://...")`, `get_holdings(..., proxy=...)` or
+  `ucits-holdings --proxy ...` in Python; without it the client reads `HTTPS_PROXY` and
+  `ALL_PROXY` (install `httpx[socks]` for SOCKS). In Node, set `HTTPS_PROXY` together with
+  `NODE_USE_ENV_PROXY=1` (Node 22.21 or later, 24.5 or later), or pass your own `Transport`.
+
+### Blocked by an issuer
+
+iShares (BlackRock) serves www.ishares.com through Akamai, which refuses most cloud and
+datacenter address ranges with `403 Access Denied`, whatever the request looks like. Measured on
+2026-11-02 from an OVH server: every iShares and BlackRock page answered 403, with the library's
+user agent, a browser's headers and a browser's TLS fingerprint alike, over IPv4 and IPv6; the
+same requests from a residential connection answered 200 with the full holdings. So iShares
+funds work from a laptop on a home connection and fail from most servers, CI runners and
+notebooks hosted in the cloud.
+
+The library says so instead of failing vaguely: the refusal is `AccessDenied` (a subclass of
+`IssuerUnavailable`, so code that caught that still works), its message names the cause, and
+`FundNotFound.blocked` lists `ishares`. A cached copy, when you have one, is served with
+`stale=True`. To read iShares from a server, send the requests through a proxy on a residential
+or otherwise unblocked address (`proxy=` above). The other five issuers answer from servers.
 
 Issuers change their sites without notice. A contract test fetches one real fund per issuer
 every morning ([contract workflow](.github/workflows/contract.yml)), so a moved endpoint shows up

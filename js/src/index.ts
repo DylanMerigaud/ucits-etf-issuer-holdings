@@ -1,6 +1,7 @@
 export { HoldingsClient, getHoldings } from "./client.js";
 export type { ClientOptions, GetHoldingsOptions, GetOptions } from "./client.js";
 export {
+  AccessDenied,
   FundNotFound,
   HoldingsError,
   InvalidISIN,

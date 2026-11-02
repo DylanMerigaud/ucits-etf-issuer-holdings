@@ -22,7 +22,7 @@ npm install ucits-etf-issuer-holdings
 import { HoldingsClient, weightsBy, topHoldings, totalWeight } from "ucits-etf-issuer-holdings";
 
 const client = new HoldingsClient();
-const fund = await client.get("IE00B4L5Y983"); // asks each issuer in turn, cached on disk
+const fund = await client.get("IE00BK5BQT80"); // asks each issuer in turn, cached on disk
 
 console.log(fund.fund_name, fund.issuer, fund.as_of, fund.holdings.length);
 console.log(totalWeight(fund)); // percent
@@ -30,14 +30,17 @@ console.log(weightsBy(fund, "country").slice(0, 3)); // [["US", 71.2], ...]
 console.log(topHoldings(fund, 5).map((h) => `${h.name} ${h.weight}`));
 ```
 
-`client.get(isin, { issuer: "ishares" })` asks one issuer only. When no issuer returns holdings
-the call rejects with `FundNotFound`, whose `reasons` say why each one did not. Look-through over
-several funds: `lookThrough({ IE00B4L5Y983: 7000, IE00BK5BQT80: 3000 }, funds, "country")`, or
+`client.get(isin, { issuer: "vanguard" })` asks one issuer only. When no issuer returns holdings
+the call rejects with `FundNotFound`, whose `reasons` say why each one did not and whose
+`blocked` names the issuers that refused your address (`AccessDenied`). iShares refuses most
+cloud and datacenter addresses with a 403, so iShares funds need a home connection or a proxy:
+set `HTTPS_PROXY` with `NODE_USE_ENV_PROXY=1` (Node 22.21 or later, 24.5 or later). Look-through
+over several funds: `lookThrough({ IE00BJ0KDQ92: 7000, IE00BK5BQT80: 3000 }, funds, "country")`, or
 `"isin"` for a single-name concentration. `asset_class` is one of `ASSET_CLASSES` (`equity`,
 `fixed_income`, `cash`, `derivative`, `fund`, `real_estate`, `commodity`, `other`) and
 `asset_class_raw` keeps the issuer's own label.
 
-Command line: `npx -p ucits-etf-issuer-holdings ucits-holdings IE00B4L5Y983 --format table --by country`.
+Command line: `npx -p ucits-etf-issuer-holdings ucits-holdings IE00BK5BQT80 --format table --by country`.
 
 ## Offline
 

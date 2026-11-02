@@ -41,7 +41,7 @@ test("fetch transport: user agent, params, headers, JSON body", async () => {
   );
   assert.equal(seen.url, "/p?x=1&y=a+b");
   assert.equal(seen.ua, USER_AGENT);
-  assert.ok(USER_AGENT.startsWith("ucits-etf-issuer-holdings/0.1.0 (+https://github.com/"));
+  assert.ok(USER_AGENT.startsWith("ucits-etf-issuer-holdings/0.1.1 (+https://github.com/"));
   assert.equal(seen.origin, "https://o");
   assert.equal(seen.ct, "application/json");
   assert.equal(seen.body, '{"k":[1,2]}');

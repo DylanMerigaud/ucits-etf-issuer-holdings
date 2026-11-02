@@ -8,6 +8,7 @@ import io
 import json
 import sys
 from collections.abc import Sequence
+from typing import Any
 
 from . import __version__
 from .client import HoldingsClient
@@ -40,6 +41,9 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--format", choices=("json", "csv", "table"), default="json")
     parser.add_argument("--by", choices=WEIGHT_KEYS, help="group the weights by this field")
     parser.add_argument("--no-cache", action="store_true", help="do not read or write the cache")
+    parser.add_argument(
+        "--proxy", help="send the requests through this proxy URL (http://, https:// or socks5://)"
+    )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     return parser
 
@@ -84,7 +88,9 @@ def _render(fund: Fund, fmt: str, by: str | None) -> str:
 def main(argv: Sequence[str] | None = None, *, transport: Transport | None = None) -> int:
     """Run the command line; returns the exit code (0 ok, 1 not found, 2 bad input)."""
     args = _parser().parse_args(argv)
-    options = {"cache_dir": None} if args.no_cache else {}
+    options: dict[str, Any] = {"cache_dir": None} if args.no_cache else {}
+    if args.proxy:
+        options["proxy"] = args.proxy
     try:
         with HoldingsClient(transport=transport, timeout=30.0, **options) as client:
             fund = client.get(args.isin, issuer=args.issuer)

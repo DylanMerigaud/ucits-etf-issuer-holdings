@@ -59,5 +59,5 @@ test("bad options exit 2; version", async () => {
   assert.equal((await run(["IE00B4L5Y983", "--format", "xml"])).code, 2);
   assert.equal((await run([])).code, 2);
   assert.equal((await run(["--bogus", "x"])).code, 2);
-  assert.equal((await run(["--version"])).out, "ucits-holdings 0.1.0\n");
+  assert.equal((await run(["--version"])).out, "ucits-holdings 0.1.1\n");
 });

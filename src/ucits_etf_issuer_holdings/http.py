@@ -70,12 +70,24 @@ class Transport(Protocol):
 
 
 class HttpxTransport:
-    """Real network transport on httpx. Proxy variables (HTTPS_PROXY, ALL_PROXY) are honoured."""
+    """Real network transport on httpx.
 
-    def __init__(self, timeout: float = 30.0, client: httpx.Client | None = None) -> None:
+    `proxy` (`http://`, `https://`, or `socks5://` with `httpx[socks]` installed) sends every
+    request through that proxy; without it the proxy variables (HTTPS_PROXY, ALL_PROXY) are
+    honoured.
+    """
+
+    def __init__(
+        self,
+        timeout: float = 30.0,
+        client: httpx.Client | None = None,
+        proxy: str | None = None,
+    ) -> None:
+        if client is not None and proxy is not None:
+            raise ValueError("pass proxy= or client=, not both")
         self._owned = client is None
         self._client = client or httpx.Client(
-            timeout=timeout, follow_redirects=True, trust_env=True
+            timeout=timeout, follow_redirects=True, trust_env=True, proxy=proxy
         )
 
     def close(self) -> None:

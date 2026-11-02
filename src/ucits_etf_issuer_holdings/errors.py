@@ -34,11 +34,41 @@ class IssuerUnavailable(HoldingsError):
         self.reason = reason
 
 
-class FundNotFound(HoldingsError):
-    """No issuer answered with holdings; `reasons` says why each one did not."""
+class AccessDenied(IssuerUnavailable):
+    """The issuer's site refused this network address (HTTP 403 before any data).
 
-    def __init__(self, isin: str, reasons: dict[str, str]) -> None:
+    iShares (BlackRock) serves its site through Akamai, which refuses most cloud and datacenter
+    address ranges whatever the request looks like, so the same call that works from a home
+    connection fails from a server or a CI runner. `url` is the address that refused.
+    """
+
+    def __init__(self, issuer: str, url: str) -> None:
+        super().__init__(
+            issuer,
+            f"HTTP 403 from {url}: the site refused this network address (its CDN blocks most "
+            "cloud and datacenter IP ranges, whatever the request headers); run from a "
+            "residential connection or send the requests through a proxy on one (README, "
+            "'Blocked by an issuer')",
+        )
+        self.url = url
+
+
+class FundNotFound(HoldingsError):
+    """No issuer answered with holdings; `reasons` says why each one did not.
+
+    `blocked` names the issuers that refused this network address (`AccessDenied`): the fund may
+    be theirs, the library could not ask.
+    """
+
+    def __init__(self, isin: str, reasons: dict[str, str], blocked: tuple[str, ...] = ()) -> None:
         detail = "; ".join(f"{name}: {why}" for name, why in reasons.items())
-        super().__init__(f"{isin}: no issuer returned holdings ({detail})")
+        lead = (
+            f"{isin}: no issuer returned holdings, and {', '.join(blocked)} refused this network "
+            "address, so the fund may be theirs"
+            if blocked
+            else f"{isin}: no issuer returned holdings"
+        )
+        super().__init__(f"{lead} ({detail})")
         self.isin = isin
         self.reasons = reasons
+        self.blocked = blocked

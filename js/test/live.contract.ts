@@ -1,8 +1,10 @@
 // Contract tests against the real issuer sites. Run with `UCITS_HOLDINGS_LIVE=1 npm run test:live`.
+// An issuer that refuses this machine's address (iShares from most datacenters) is skipped with
+// the AccessDenied it raised; any other failure is a broken endpoint and fails.
 // Node's fetch honours proxies only with NODE_USE_ENV_PROXY=1 and HTTPS_PROXY / HTTP_PROXY set.
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { HoldingsClient, totalWeight } from "../dist/index.js";
+import { FundNotFound, HoldingsClient, totalWeight } from "../dist/index.js";
 
 const live = process.env["UCITS_HOLDINGS_LIVE"] === "1";
 
@@ -18,8 +20,17 @@ const FUNDS: Array<[string, string, boolean, number]> = [
 ];
 
 for (const [isin, issuer, hasCountry, maxAge] of FUNDS) {
-  test(`live: ${issuer} ${isin}`, { skip: live ? false : "set UCITS_HOLDINGS_LIVE=1", timeout: 120_000 }, async () => {
-    const fund = await new HoldingsClient({ cacheDir: null }).get(isin, { issuer });
+  test(`live: ${issuer} ${isin}`, { skip: live ? false : "set UCITS_HOLDINGS_LIVE=1", timeout: 120_000 }, async (t) => {
+    let fund;
+    try {
+      fund = await new HoldingsClient({ cacheDir: null }).get(isin, { issuer });
+    } catch (error) {
+      if (error instanceof FundNotFound && error.blocked.includes(issuer)) {
+        t.skip(`${issuer} refused this address (AccessDenied): ${error.message}`);
+        return;
+      }
+      throw error;
+    }
     assert.equal(fund.issuer, issuer);
     assert.ok(fund.holdings.length >= 20, `${fund.holdings.length} holdings`);
     const total = totalWeight(fund);

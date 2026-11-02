@@ -12,6 +12,7 @@ import {
   makeHolding,
   number,
   okJson,
+  requireOk,
   requireHoldings,
   text,
   type Issuer,
@@ -66,9 +67,7 @@ type Obj = Record<string, unknown>;
 
 /** The portfolio ids listed in the fund list page's state script. */
 function parsePage(response: HttpResponse): string[] {
-  if (response.status !== 200) {
-    throw new IssuerUnavailable("vanguard", `HTTP ${response.status} from ${response.url}`);
-  }
+  requireOk("vanguard", response);
   const match = STATE.exec(response.text);
   if (match === null) throw new IssuerUnavailable("vanguard", "serverApp-state script not found");
   let node: unknown;

@@ -13,6 +13,7 @@ import {
   makeHolding,
   number,
   okJson,
+  requireOk,
   requireHoldings,
   text,
   type Issuer,
@@ -75,9 +76,7 @@ function findFund(funds: unknown[], isin: string): [string | null, string] | nul
 
 /** The labelled cells above the table (`Fund Name:` ...) and the holdings. */
 function parseHoldings(response: HttpResponse): [Map<string, Cell>, Holding[]] {
-  if (response.status !== 200) {
-    throw new IssuerUnavailable("spdr", `HTTP ${response.status} from ${response.url}`);
-  }
+  requireOk("spdr", response);
   let rows: Cell[][];
   try {
     [, rows] = readSheet(response.content);

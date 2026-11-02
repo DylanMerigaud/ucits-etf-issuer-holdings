@@ -1,4 +1,4 @@
-import { FundNotFound, HoldingsError, IssuerUnavailable, NotListed } from "./errors.js";
+import { AccessDenied, FundNotFound, HoldingsError, IssuerUnavailable, NotListed } from "./errors.js";
 import { CachingTransport, DEFAULT_CACHE_DIR, FetchTransport, type Transport } from "./http.js";
 import { normalizeIsin } from "./isin.js";
 import { ISSUERS, ISSUER_ORDER } from "./issuers/index.js";
@@ -45,7 +45,8 @@ export class HoldingsClient {
    *
    * @throws {InvalidISIN} for a malformed ISIN.
    * @throws {Error} for an unknown issuer name.
-   * @throws {FundNotFound} when no issuer answered with holdings.
+   * @throws {FundNotFound} when no issuer answered with holdings (its `blocked` names the
+   *   issuers whose site refused this network address).
    */
   async get(isin: string, opts: GetOptions = {}): Promise<Fund> {
     const code = normalizeIsin(isin);
@@ -57,10 +58,12 @@ export class HoldingsClient {
       names = this.names;
     }
     const reasons: Record<string, string> = {};
+    const blocked: string[] = [];
     for (const name of names) {
       try {
         return await ISSUERS[name]!.fetch(code, this.http);
       } catch (error) {
+        if (error instanceof AccessDenied) blocked.push(name);
         if (error instanceof NotListed || error instanceof IssuerUnavailable) {
           reasons[name] = error.reason;
           continue;
@@ -72,7 +75,7 @@ export class HoldingsClient {
           : `unexpected answer: ${typeof error}: ${String(error)}`;
       }
     }
-    throw new FundNotFound(code, reasons);
+    throw new FundNotFound(code, reasons, blocked);
   }
 }
 

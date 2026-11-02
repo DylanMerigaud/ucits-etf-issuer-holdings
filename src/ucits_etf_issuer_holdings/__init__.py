@@ -1,9 +1,10 @@
 """Full holdings of a UCITS ETF by ISIN, read from the issuer's own published files."""
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from .client import HoldingsClient, get_holdings
 from .errors import (
+    AccessDenied,
     FundNotFound,
     HoldingsError,
     InvalidISIN,
@@ -18,6 +19,7 @@ __all__ = [
     "ASSET_CLASSES",
     "LOOK_THROUGH_KEYS",
     "WEIGHT_KEYS",
+    "AccessDenied",
     "Fund",
     "FundNotFound",
     "Holding",

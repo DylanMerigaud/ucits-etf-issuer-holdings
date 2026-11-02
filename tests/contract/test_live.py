@@ -1,6 +1,8 @@
 """Contract tests against the real issuer sites. Run with UCITS_HOLDINGS_LIVE=1.
 
-Set ALL_PROXY or HTTPS_PROXY to send the traffic through a proxy.
+Set UCITS_HOLDINGS_PROXY (or ALL_PROXY, HTTPS_PROXY) to send the traffic through a proxy. An issuer
+that refuses this machine's address (iShares from most datacenters) is skipped with the
+AccessDenied it raised; any other failure is a broken endpoint and fails.
 """
 
 from __future__ import annotations
@@ -10,7 +12,7 @@ from datetime import date, datetime
 
 import pytest
 
-from ucits_etf_issuer_holdings import HoldingsClient
+from ucits_etf_issuer_holdings import AccessDenied, FundNotFound, HoldingsClient
 
 pytestmark = [
     pytest.mark.live,
@@ -33,8 +35,14 @@ FUNDS = [
 
 @pytest.mark.parametrize(("isin", "issuer", "has_country", "max_age"), FUNDS)
 def test_large_fund(isin: str, issuer: str, has_country: bool, max_age: int) -> None:
-    with HoldingsClient(cache_dir=None) as client:
-        fund = client.get(isin, issuer=issuer)
+    proxy = os.environ.get("UCITS_HOLDINGS_PROXY") or None
+    with HoldingsClient(cache_dir=None, proxy=proxy) as client:
+        try:
+            fund = client.get(isin, issuer=issuer)
+        except FundNotFound as exc:
+            if issuer in exc.blocked:
+                pytest.skip(f"{issuer} refused this address ({AccessDenied.__name__}): {exc}")
+            raise
     assert fund.issuer == issuer
     assert len(fund.holdings) >= 20
     assert 90 <= fund.total_weight <= 110

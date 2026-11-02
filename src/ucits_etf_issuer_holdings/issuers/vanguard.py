@@ -21,6 +21,7 @@ from .base import (
     number,
     ok_json,
     require_holdings,
+    require_ok,
     text,
 )
 
@@ -75,8 +76,7 @@ _STATE = re.compile(r'<script id="serverApp-state"[^>]*>(.*?)</script>', re.S)
 
 def _parse_page(response: Response) -> list[str]:
     """The portfolio ids listed in the fund list page's state script."""
-    if response.status != 200:
-        raise IssuerUnavailable("vanguard", f"HTTP {response.status} from {response.url}")
+    require_ok("vanguard", response)
     match = _STATE.search(response.text)
     if match is None:
         raise IssuerUnavailable("vanguard", "serverApp-state script not found")
