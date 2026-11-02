@@ -1,6 +1,6 @@
 {
   "name": "ucits-etf-issuer-holdings",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Full holdings of a UCITS ETF by ISIN, read from the issuer's own published files (iShares, Vanguard, Xtrackers, Amundi, SPDR, Invesco).",
   "type": "module",
   "license": "MIT",

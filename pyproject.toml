@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ucits-etf-issuer-holdings"
-version = "0.1.0"
+version = "0.1.1"
 description = "Full holdings of a UCITS ETF by ISIN, read from the issuer's own published files and normalised to one JSON shape."
 readme = "README.md"
 requires-python = ">=3.10"

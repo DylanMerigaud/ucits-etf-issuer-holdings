@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.1 (2026-11-02)
+
+- iShares from a server: iShares serves its site through Akamai, which refuses most cloud and
+  datacenter addresses with `403 Access Denied` whatever the request headers (measured from an
+  OVH server; the same requests from a residential connection return the full holdings, so the
+  endpoints did not move). 0.1.0 reported this as a plain `FundNotFound`. A 403 from an issuer
+  is now `AccessDenied` (a subclass of `IssuerUnavailable`), whose message names the cause and
+  the fix, and `FundNotFound.blocked` lists the issuers that refused, in Python and TypeScript.
+- `proxy=` on `HoldingsClient`, `get_holdings` and `HttpxTransport`, and `--proxy` on the Python
+  command line, to read iShares through an unblocked address. Node reads `HTTPS_PROXY` with
+  `NODE_USE_ENV_PROXY=1`.
+- The README quickstart and the live examples use funds every issuer serves from a server
+  (Vanguard FTSE All-World, SPDR, Xtrackers); a test keeps iShares funds out of them, and a
+  contract test runs every fund the docs name against the live sites. The live contract tests
+  skip an issuer that refuses the runner's address, with the `AccessDenied` message, instead of
+  failing.
+- UBS: not covered. Its ETF pages offer no public per-fund holdings file we could find; the
+  README's coverage table says so.
+
 ## 0.1.0 (2026-11-02)
 
 First release, in Python and TypeScript with the same JSON output.
