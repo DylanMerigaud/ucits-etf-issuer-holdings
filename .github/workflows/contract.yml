@@ -1,0 +1,35 @@
+name: contract
+
+# Every issuer moves its endpoints without notice. These tests fetch one real fund per issuer
+# every morning, so a move turns this workflow red the day it happens.
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --all-groups
+      - run: uv run pytest tests/contract -m live -v
+        env:
+          UCITS_HOLDINGS_LIVE: "1"
+
+  typescript:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test:live
+        env:
+          UCITS_HOLDINGS_LIVE: "1"

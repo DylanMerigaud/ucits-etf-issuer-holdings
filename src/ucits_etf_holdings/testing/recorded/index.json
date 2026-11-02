@@ -1,0 +1,189 @@
+{
+ "recorded_at": "2026-11-02",
+ "note": "Trimmed copies of real issuer answers, recorded through the network on that day.",
+ "entries": [
+  {
+   "method": "GET",
+   "url": "https://www.ishares.com/varnish-api/blk-product-screener-server/api/v1/product-screener/product-data",
+   "params": {
+    "country": "de",
+    "language": "de",
+    "siteName": "de-ishares-v2",
+    "userType": "individual"
+   },
+   "match_json": null,
+   "status": 200,
+   "content_type": "application/json",
+   "file": "ishares/screener.json"
+  },
+  {
+   "method": "GET",
+   "url": "https://www.ishares.com/varnish-api/uk-retail01-product-data/product-data/api/v2/get-product-data",
+   "params": {
+    "appSubType": "ISHARES",
+    "appType": "PRODUCT_PAGE",
+    "component": "holdings",
+    "locale": "en_GB",
+    "portfolioId": "251882",
+    "targetSite": "ishares-uk",
+    "userType": "individual",
+    "excludeContent": "true",
+    "includeConfig": "false"
+   },
+   "match_json": null,
+   "status": 200,
+   "content_type": "application/json",
+   "file": "ishares/holdings_251882.json"
+  },
+  {
+   "method": "GET",
+   "url": "https://www.ishares.com/varnish-api/uk-retail01-product-data/product-data/api/v2/get-product-data",
+   "params": {
+    "appSubType": "ISHARES",
+    "appType": "PRODUCT_PAGE",
+    "component": "holdings",
+    "locale": "en_GB",
+    "portfolioId": "291773",
+    "targetSite": "ishares-uk",
+    "userType": "individual",
+    "excludeContent": "true",
+    "includeConfig": "false"
+   },
+   "match_json": null,
+   "status": 200,
+   "content_type": "application/json",
+   "file": "ishares/holdings_291773.json"
+  },
+  {
+   "method": "GET",
+   "url": "https://www.de.vanguard/professionell/anlageprodukte",
+   "params": null,
+   "match_json": null,
+   "status": 200,
+   "content_type": "text/html",
+   "file": "vanguard/products.html"
+  },
+  {
+   "method": "POST",
+   "url": "https://www.de.vanguard/gpx/graphql",
+   "params": null,
+   "match_json": {
+    "operationName": "FundsQuery",
+    "variables": {
+     "portIds": [
+      "9679",
+      "9505",
+      "9104"
+     ]
+    }
+   },
+   "status": 200,
+   "content_type": "application/json",
+   "file": "vanguard/funds.json"
+  },
+  {
+   "method": "POST",
+   "url": "https://www.de.vanguard/gpx/graphql",
+   "params": null,
+   "match_json": {
+    "operationName": "FundsHoldingsQuery",
+    "variables": {
+     "portIds": [
+      "9679"
+     ],
+     "lastItemKey": null
+    }
+   },
+   "status": 200,
+   "content_type": "application/json",
+   "file": "vanguard/holdings_9679_p1.json"
+  },
+  {
+   "method": "POST",
+   "url": "https://www.de.vanguard/gpx/graphql",
+   "params": null,
+   "match_json": {
+    "operationName": "FundsHoldingsQuery",
+    "variables": {
+     "portIds": [
+      "9679"
+     ],
+     "lastItemKey": "{\"skey\":0.00685,\"portIdKey\":\"fundBorHoldings-9679-2026-09-30\",\"pkey\":\"fundBorHoldings-9679-2749182406ef074029f5bbdaff29301f508db9dc\"}"
+    }
+   },
+   "status": 200,
+   "content_type": "application/json",
+   "file": "vanguard/holdings_9679_p2.json"
+  },
+  {
+   "method": "GET",
+   "url": "https://etf.dws.com/etfdata/export/GBR/ENG/excel/product/constituent/LU0274211480/",
+   "params": null,
+   "match_json": null,
+   "status": 200,
+   "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+   "file": "xtrackers/LU0274211480.xlsx"
+  },
+  {
+   "method": "POST",
+   "url": "https://www.amundietf.de/mapi/ProductAPI/getProductsData",
+   "params": null,
+   "match_json": {
+    "productIds": [
+     "IE000BI8OT95"
+    ]
+   },
+   "status": 200,
+   "content_type": "application/json",
+   "file": "amundi/IE000BI8OT95.json"
+  },
+  {
+   "method": "POST",
+   "url": "https://www.amundietf.de/mapi/ProductAPI/getProductsData",
+   "params": null,
+   "match_json": {
+    "productIds": [
+     "LU1681043599"
+    ]
+   },
+   "status": 200,
+   "content_type": "application/json",
+   "file": "amundi/LU1681043599.json"
+  },
+  {
+   "method": "GET",
+   "url": "https://www.ssga.com/bin/v1/ssmp/fund/fundfinder",
+   "params": {
+    "country": "de",
+    "language": "de",
+    "role": "individual",
+    "product": "etfs",
+    "ui": "fund-finder"
+   },
+   "match_json": null,
+   "status": 200,
+   "content_type": "application/json",
+   "file": "spdr/fundfinder.json"
+  },
+  {
+   "method": "GET",
+   "url": "https://www.ssga.com/library-content/products/fund-data/etfs/emea/holdings-daily-emea-en-spyw-gy.xlsx",
+   "params": null,
+   "match_json": null,
+   "status": 200,
+   "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+   "file": "spdr/spyw-gy.xlsx"
+  },
+  {
+   "method": "GET",
+   "url": "https://dng-api.invesco.com/cache/v1/accounts/en_GB/shareclasses/IE000716YHJ7/holdings/fund",
+   "params": {
+    "idType": "isin"
+   },
+   "match_json": null,
+   "status": 200,
+   "content_type": "application/json",
+   "file": "invesco/IE000716YHJ7.json"
+  }
+ ]
+}
