@@ -126,3 +126,50 @@ def test_get_holdings_function() -> None:
         "IE000716YHJ7", issuer="invesco", transport=recorded_transport(), cache_dir=None
     )
     assert isinstance(fund, Fund)
+
+
+def test_a_200_answer_that_does_not_parse_keeps_the_cached_copy(tmp_path: Path) -> None:
+    now = [1_700_000_000.0]
+    first = HoldingsClient(
+        transport=CachingTransport(RecordedTransport(), tmp_path, clock=lambda: now[0]),
+        cache_dir=None,
+    ).get("IE000716YHJ7", issuer="invesco")
+    (cache_file,) = tmp_path.glob("*.cache")
+    good = cache_file.read_bytes()
+    now[0] += 7 * 3600
+    broken = StaticTransport(Response(200, b'{"holdings": "x"}', "application/json", "u"))
+    again = HoldingsClient(
+        transport=CachingTransport(broken, tmp_path, clock=lambda: now[0]), cache_dir=None
+    ).get("IE000716YHJ7", issuer="invesco")
+    assert again.stale is True
+    assert again.holdings == first.holdings
+    assert again.fetched_at == "2023-11-14T22:13:20Z"
+    assert cache_file.read_bytes() == good
+
+
+def test_a_200_answer_that_does_not_parse_is_not_cached(tmp_path: Path) -> None:
+    broken = StaticTransport(Response(200, b'{"holdings": "x"}', "application/json", "u"))
+    with pytest.raises(FundNotFound) as info:
+        HoldingsClient(transport=broken, cache_dir=tmp_path).get("IE000716YHJ7", issuer="invesco")
+    assert info.value.reasons["invesco"] == "holdings is not a list"
+    assert not list(tmp_path.glob("*.cache"))
+
+
+def test_not_listed_answer_is_cached(tmp_path: Path) -> None:
+    empty = StaticTransport(Response(200, b"{}", "application/json", "u"))
+    c = HoldingsClient(transport=empty, cache_dir=tmp_path)
+    for _ in range(2):
+        with pytest.raises(FundNotFound):
+            c.get("IE000716YHJ7", issuer="invesco")
+    assert len(empty.requests) == 1
+
+
+def test_fetched_at_is_the_oldest_answer_used(tmp_path: Path) -> None:
+    now = [1_700_000_000.0]
+    cache = CachingTransport(RecordedTransport(), tmp_path, clock=lambda: now[0])
+    HoldingsClient(transport=cache, cache_dir=None).get("IE00B4L5Y983", issuer="ishares")
+    # seven hours on the holdings (kept six hours) are fetched again, the index (a day) is not
+    now[0] += 7 * 3600
+    later = HoldingsClient(transport=cache, cache_dir=None).get("IE00B4L5Y983", issuer="ishares")
+    assert later.fetched_at == "2023-11-14T22:13:20Z"
+    assert later.stale is False

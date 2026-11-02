@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readdir, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -299,4 +299,53 @@ test("caching: a cache file the Python package wrote is served", async () => {
     ttl: 60,
   });
   assert.deepEqual([served.text, served.storedAt, served.url, served.stale], ["body", 1000.5, "https://x/a", false]);
+});
+
+test("a 200 answer that does not parse keeps the cached copy", async () => {
+  const dir = await tmp();
+  let now = 1_700_000_000;
+  const first = await new HoldingsClient({
+    transport: new CachingTransport(new RecordedTransport(), dir, () => now),
+    cacheDir: null,
+  }).get("IE000716YHJ7", { issuer: "invesco" });
+  const [file] = await readdir(dir);
+  const good = await readFile(join(dir, file!));
+  now += 7 * 3600;
+  const broken = new StaticTransport(reply(200, '{"holdings": "x"}', "application/json"));
+  const again = await new HoldingsClient({
+    transport: new CachingTransport(broken, dir, () => now),
+    cacheDir: null,
+  }).get("IE000716YHJ7", { issuer: "invesco" });
+  assert.equal(again.stale, true);
+  assert.deepEqual(again.holdings, first.holdings);
+  assert.equal(again.fetched_at, "2023-11-14T22:13:20Z");
+  assert.deepEqual(await readFile(join(dir, file!)), good);
+});
+
+test("a 200 answer that does not parse is not cached", async () => {
+  const dir = await tmp();
+  const broken = new StaticTransport(reply(200, '{"holdings": "x"}', "application/json"));
+  await assert.rejects(
+    new HoldingsClient({ transport: broken, cacheDir: dir }).get("IE000716YHJ7", { issuer: "invesco" }),
+    (e: FundNotFound) => e.reasons["invesco"] === "holdings is not a list",
+  );
+  assert.deepEqual(await readdir(dir), []);
+});
+
+test("a not-listed answer is cached", async () => {
+  const empty = new StaticTransport(reply(200, "{}", "application/json"));
+  const c = new HoldingsClient({ transport: empty, cacheDir: await tmp() });
+  for (let i = 0; i < 2; i++) await assert.rejects(c.get("IE000716YHJ7", { issuer: "invesco" }), FundNotFound);
+  assert.equal(empty.requests.length, 1);
+});
+
+test("fetched_at is the oldest answer used", async () => {
+  let now = 1_700_000_000;
+  const cache = new CachingTransport(new RecordedTransport(), await tmp(), () => now);
+  await new HoldingsClient({ transport: cache, cacheDir: null }).get("IE00B4L5Y983", { issuer: "ishares" });
+  // seven hours on the holdings (kept six hours) are fetched again, the index (a day) is not
+  now += 7 * 3600;
+  const later = await new HoldingsClient({ transport: cache, cacheDir: null }).get("IE00B4L5Y983", { issuer: "ishares" });
+  assert.equal(later.fetched_at, "2023-11-14T22:13:20Z");
+  assert.equal(later.stale, false);
 });

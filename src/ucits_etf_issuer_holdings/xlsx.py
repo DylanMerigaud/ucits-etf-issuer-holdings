@@ -6,12 +6,17 @@ import io
 import posixpath
 import re
 import zipfile
+import zlib
 from xml.etree import ElementTree
 
 Cell = str | float | bool | None
 
 _REL_NS = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 _REF = re.compile(r"([A-Z]+)")
+
+
+class XlsxError(ValueError):
+    """The bytes are not a readable workbook."""
 
 
 def _local(tag: str) -> str:
@@ -32,7 +37,7 @@ def _column_index(ref: str) -> int:
     """Zero-based column of a cell reference such as `AB12`."""
     match = _REF.match(ref)
     if match is None:
-        raise ValueError(f"bad cell reference {ref!r}")
+        raise XlsxError(f"bad cell reference {ref!r}")
     index = 0
     for ch in match.group(1):
         index = index * 26 + (ord(ch) - 64)
@@ -58,7 +63,7 @@ def _first_sheet(zf: zipfile.ZipFile) -> tuple[str, str]:
             target = rel.get("Target", "")
             path = target[1:] if target.startswith("/") else posixpath.join("xl", target)
             return first.get("name", ""), posixpath.normpath(path)
-    raise ValueError(f"no relationship {rel_id!r} for the first sheet")
+    raise XlsxError(f"no relationship {rel_id!r} for the first sheet")
 
 
 def _cell_value(cell: ElementTree.Element, shared: list[str]) -> Cell:
@@ -70,7 +75,10 @@ def _cell_value(cell: ElementTree.Element, shared: list[str]) -> Cell:
     if raw is None:
         return None
     if kind == "s":
-        return shared[int(raw)]
+        position = int(raw) if raw.strip().isdigit() else -1
+        if not 0 <= position < len(shared):
+            raise XlsxError(f"shared string {raw} out of range")
+        return shared[position]
     if kind == "b":
         return raw.strip() == "1"
     if kind in ("str", "e"):
@@ -84,16 +92,33 @@ def _cell_value(cell: ElementTree.Element, shared: list[str]) -> Cell:
 def read_sheet(data: bytes) -> tuple[str, list[list[Cell]]]:
     """Return (sheet name, rows) of the first sheet of an xlsx file.
 
-    Missing cells inside a row, including leading ones, are None. Raises ValueError when the
-    bytes are not a readable workbook.
+    Missing cells inside a row, including leading ones, are None. Raises `XlsxError` (a
+    ValueError) when the bytes are not a readable workbook.
     """
     try:
-        with zipfile.ZipFile(io.BytesIO(data)) as zf:
-            name, path = _first_sheet(zf)
-            shared = _shared_strings(zf)
-            sheet = ElementTree.fromstring(zf.read(path))
-    except (zipfile.BadZipFile, KeyError, ElementTree.ParseError, IndexError) as exc:
-        raise ValueError(f"not a readable xlsx: {exc}") from exc
+        return _read_sheet(data)
+    except XlsxError:
+        raise
+    except (
+        zipfile.BadZipFile,
+        zlib.error,
+        KeyError,
+        ElementTree.ParseError,
+        IndexError,
+        ValueError,
+        NotImplementedError,
+        RuntimeError,
+        EOFError,
+        OSError,
+    ) as exc:
+        raise XlsxError(f"not a readable xlsx: {exc}") from exc
+
+
+def _read_sheet(data: bytes) -> tuple[str, list[list[Cell]]]:
+    with zipfile.ZipFile(io.BytesIO(data)) as zf:
+        name, path = _first_sheet(zf)
+        shared = _shared_strings(zf)
+        sheet = ElementTree.fromstring(zf.read(path))
     rows: list[list[Cell]] = []
     for sheet_data in _children(sheet, "sheetData"):
         for row in _children(sheet_data, "row"):

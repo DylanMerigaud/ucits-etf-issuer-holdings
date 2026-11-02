@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from pathlib import Path
 
-from .errors import FundNotFound, IssuerUnavailable, NotListed
+from .errors import FundNotFound, HoldingsError, IssuerUnavailable, NotListed
 from .http import DEFAULT_CACHE_DIR, CachingTransport, HttpxTransport, Transport
 from .isin import normalize
 from .issuers import ISSUERS, ORDER
@@ -56,6 +56,11 @@ class HoldingsClient:
                 fund = ISSUERS[name].fetch(code, self._http)
             except (NotListed, IssuerUnavailable) as exc:
                 reasons[name] = exc.reason
+                continue
+            except HoldingsError:
+                raise
+            except Exception as exc:  # one malformed answer must not stop the lookup
+                reasons[name] = f"unexpected answer: {type(exc).__name__}: {exc}"
                 continue
             return fund
         raise FundNotFound(code, reasons)

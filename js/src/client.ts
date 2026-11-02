@@ -1,4 +1,4 @@
-import { FundNotFound, IssuerUnavailable, NotListed } from "./errors.js";
+import { FundNotFound, HoldingsError, IssuerUnavailable, NotListed } from "./errors.js";
 import { CachingTransport, DEFAULT_CACHE_DIR, FetchTransport, type Transport } from "./http.js";
 import { normalizeIsin } from "./isin.js";
 import { ISSUERS, ISSUER_ORDER } from "./issuers/index.js";
@@ -31,7 +31,7 @@ export class HoldingsClient {
   /** @throws {Error} when an issuer name is unknown. */
   constructor(options: ClientOptions = {}) {
     const names = options.issuers !== undefined ? [...options.issuers] : [...ISSUER_ORDER];
-    const unknown = names.filter((name) => !(name in ISSUERS));
+    const unknown = names.filter((name) => !Object.hasOwn(ISSUERS, name));
     if (unknown.length > 0) throw new Error(`unknown issuer(s): ${unknown.join(", ")}`);
     this.names = names;
     const { transport, cacheDir } = options;
@@ -51,7 +51,7 @@ export class HoldingsClient {
     const code = normalizeIsin(isin);
     let names: readonly string[];
     if (opts.issuer !== undefined) {
-      if (!(opts.issuer in ISSUERS)) throw new Error(`unknown issuer: ${pyRepr(opts.issuer)}`);
+      if (!Object.hasOwn(ISSUERS, opts.issuer)) throw new Error(`unknown issuer: ${pyRepr(opts.issuer)}`);
       names = [opts.issuer];
     } else {
       names = this.names;
@@ -65,7 +65,11 @@ export class HoldingsClient {
           reasons[name] = error.reason;
           continue;
         }
-        throw error;
+        if (error instanceof HoldingsError) throw error;
+        // one malformed answer must not stop the lookup
+        reasons[name] = error instanceof Error
+          ? `unexpected answer: ${error.name}: ${error.message}`
+          : `unexpected answer: ${typeof error}: ${String(error)}`;
       }
     }
     throw new FundNotFound(code, reasons);

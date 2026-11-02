@@ -1,16 +1,19 @@
 import { IssuerUnavailable, NotListed } from "../errors.js";
-import type { Transport } from "../http.js";
+import type { HttpResponse, Transport } from "../http.js";
 import type { Fund, Holding } from "../models.js";
-import { dig, isObject, pyStr, truthy } from "../pyish.js";
+import { isObject, pyStr, truthy } from "../pyish.js";
 import {
   HOLDINGS_TTL,
   INDEX_TTL,
-  call,
+  asDict,
+  fetchParsed,
+  fetchedAt,
+  isoDate,
   makeHolding,
-  nowUtc,
   number,
   okJson,
   requireHoldings,
+  text,
   type Issuer,
 } from "./base.js";
 
@@ -61,112 +64,159 @@ const STATE = /<script id="serverApp-state"[^>]*>([\s\S]*?)<\/script>/;
 
 type Obj = Record<string, unknown>;
 
+/** The portfolio ids listed in the fund list page's state script. */
+function parsePage(response: HttpResponse): string[] {
+  if (response.status !== 200) {
+    throw new IssuerUnavailable("vanguard", `HTTP ${response.status} from ${response.url}`);
+  }
+  const match = STATE.exec(response.text);
+  if (match === null) throw new IssuerUnavailable("vanguard", "serverApp-state script not found");
+  let node: unknown;
+  try {
+    node = JSON.parse(match[1]!);
+  } catch {
+    throw new IssuerUnavailable("vanguard", "portIds missing in the page state");
+  }
+  for (const key of ["_angular_initial_state", ":items", "root", ":items", "site-config", "portIds"]) {
+    node = isObject(node) ? node[key] : undefined;
+  }
+  const ids =
+    typeof node === "string"
+      ? node
+          .split(",")
+          .map((part) => part.trim())
+          .filter((part) => part !== "")
+      : [];
+  if (ids.length === 0) throw new IssuerUnavailable("vanguard", "portIds missing in the page state");
+  return ids;
+}
+
+function graphqlData(response: HttpResponse, operation: string): Obj {
+  const data = okJson("vanguard", response);
+  if (!isObject(data) || truthy(data["errors"]) || !isObject(data["data"])) {
+    throw new IssuerUnavailable("vanguard", `GraphQL ${operation} answered with errors`);
+  }
+  return data["data"];
+}
+
+function parseFunds(response: HttpResponse): unknown[] {
+  const funds = graphqlData(response, "FundsQuery")["funds"];
+  if (!Array.isArray(funds)) {
+    throw new IssuerUnavailable("vanguard", "funds missing in the FundsQuery answer");
+  }
+  return funds;
+}
+
+/** The portId of the fund whose identifiers carry this ISIN, null when no fund does. */
+function portIdOf(funds: unknown[], isin: string): string | null {
+  for (const fund of funds) {
+    if (!isObject(fund)) continue;
+    const identifiers = asDict(fund["profile"])["identifiers"];
+    if (!Array.isArray(identifiers)) continue;
+    if (identifiers.some((i) => isObject(i) && i["altIdValue"] === isin)) {
+      const portId = fund["portId"];
+      const usable =
+        (typeof portId === "string" || (typeof portId === "number" && Number.isInteger(portId))) &&
+        String(portId).trim() !== "";
+      if (!usable) throw new IssuerUnavailable("vanguard", "portId missing for the fund");
+      return String(portId);
+    }
+  }
+  return null;
+}
+
+interface Page {
+  profile: Obj;
+  holdings: Holding[];
+  dates: string[];
+  key: unknown;
+}
+
+function parseHoldings(response: HttpResponse): Page {
+  const data = graphqlData(response, "FundsHoldingsQuery");
+  const funds = data["funds"];
+  const first = Array.isArray(funds) && funds.length > 0 ? asDict(funds[0]) : {};
+  const blocks = data["borHoldings"];
+  const block = Array.isArray(blocks) && blocks.length > 0 ? asDict(blocks[0])["holdings"] : undefined;
+  const items = isObject(block) ? block["items"] : undefined;
+  if (!isObject(block) || !Array.isArray(items)) {
+    throw new IssuerUnavailable("vanguard", "holdings path missing in the answer");
+  }
+  const holdings: Holding[] = [];
+  const dates: string[] = [];
+  for (const item of items) {
+    if (!isObject(item)) continue;
+    const weight = number(item["marketValuePercentage"]);
+    const name = truthy(item["issuerName"]) ? item["issuerName"] : item["securityLongDescription"];
+    if (weight === null || !truthy(name)) continue;
+    const date = isoDate(item["effectiveDate"]);
+    if (date !== null) dates.push(date);
+    holdings.push(
+      makeHolding(pyStr(name), weight, {
+        ticker: item["ticker"],
+        country: item["bloombergIsoCountry"],
+        sector: truthy(item["gicsSectorDescription"])
+          ? item["gicsSectorDescription"]
+          : item["icbSectorDescription"],
+        asset_class: item["securityType"],
+      }),
+    );
+  }
+  return { profile: asDict(first["profile"]), holdings, dates, key: block["lastItemKey"] ?? null };
+}
+
 /** Adapter for Vanguard UCITS ETFs and funds listed on the German site. */
 export class VanguardIssuer implements Issuer {
   readonly name = "vanguard";
 
-  private portIds(page: string): string[] {
-    const match = STATE.exec(page);
-    if (match === null) throw new IssuerUnavailable(this.name, "serverApp-state script not found");
-    let ids: unknown;
-    try {
-      const state: unknown = JSON.parse(match[1]!);
-      ids = dig(state, "_angular_initial_state", ":items", "root", ":items", "site-config", "portIds");
-    } catch {
-      throw new IssuerUnavailable(this.name, "portIds missing in the page state");
-    }
-    return pyStr(ids)
-      .split(",")
-      .map((part) => part.trim())
-      .filter((part) => part !== "");
-  }
-
-  private async graphql(
+  private graphql<T>(
     http: Transport,
     operation: string,
     query: string,
     variables: Obj,
     ttl: number,
-  ): Promise<[Obj, boolean]> {
+    parse: (response: HttpResponse) => T,
+  ): Promise<[HttpResponse, T]> {
     const body = { operationName: operation, variables, query };
-    const answer = await call(this.name, http, "POST", GRAPHQL_URL, {
-      json: body,
-      headers: HEADERS,
-      ttl,
-    });
-    const data = okJson(this.name, answer);
-    if (!isObject(data) || truthy(data["errors"]) || !isObject(data["data"])) {
-      throw new IssuerUnavailable(this.name, `GraphQL ${operation} answered with errors`);
-    }
-    return [data["data"], answer.stale];
+    return fetchParsed(this.name, http, "POST", GRAPHQL_URL, parse, { json: body, headers: HEADERS, ttl });
   }
 
   /** Find the portfolio id of the ISIN, then page through its holdings. */
   async fetch(isin: string, http: Transport): Promise<Fund> {
-    const page = await call(this.name, http, "GET", PRODUCTS_URL, { ttl: INDEX_TTL });
-    if (page.status !== 200) {
-      throw new IssuerUnavailable(this.name, `HTTP ${page.status} from ${page.url}`);
-    }
-    const portIds = this.portIds(page.text);
-    const [funds, fundsStale] = await this.graphql(
+    const [page, portIds] = await fetchParsed(this.name, http, "GET", PRODUCTS_URL, parsePage, {
+      ttl: INDEX_TTL,
+    });
+    const [fundsAnswer, funds] = await this.graphql(
       http,
       "FundsQuery",
       FUNDS_QUERY,
       { portIds },
       INDEX_TTL,
+      parseFunds,
     );
-    let stale = fundsStale || page.stale;
-    let portId: string | null = null;
-    for (const fund of (truthy(funds["funds"]) ? funds["funds"] : []) as Obj[]) {
-      const profile = fund["profile"];
-      const identifiers = ((truthy(profile) ? (profile as Obj)["identifiers"] : undefined) ??
-        []) as Obj[];
-      if (identifiers.some((i) => i["altIdValue"] === isin)) {
-        portId = pyStr(fund["portId"]);
-        break;
-      }
-    }
+    const portId = portIdOf(funds, isin);
     if (portId === null) throw new NotListed(this.name, isin, "not in the Vanguard fund list");
 
+    const answers = [page, fundsAnswer];
     const holdings: Holding[] = [];
     let profile: Obj = {};
     const dates: string[] = [];
-    let key: unknown = null;
+    let key: unknown = null; // sent back exactly as the previous page returned it
     let finished = false;
     for (let pageNo = 0; pageNo < MAX_PAGES; pageNo++) {
-      const [data, pageStale] = await this.graphql(
+      const [answer, parsed] = await this.graphql(
         http,
         "FundsHoldingsQuery",
         HOLDINGS_QUERY,
         { portIds: [portId], lastItemKey: key },
         HOLDINGS_TTL,
+        parseHoldings,
       );
-      stale = stale || pageStale;
-      let items: Obj[];
-      try {
-        if (!truthy(profile)) profile = dig(data, "funds", 0, "profile") as Obj;
-        const block = dig(data, "borHoldings", 0, "holdings") as Obj;
-        items = dig(block, "items") as Obj[];
-        key = block["lastItemKey"] ?? null;
-      } catch {
-        throw new IssuerUnavailable(this.name, "holdings path missing in the answer");
-      }
-      for (const item of items) {
-        const weight = number(item["marketValuePercentage"]);
-        const name = truthy(item["issuerName"]) ? item["issuerName"] : item["securityLongDescription"];
-        if (weight === null || !truthy(name)) continue;
-        if (truthy(item["effectiveDate"])) dates.push(pyStr(item["effectiveDate"]));
-        holdings.push(
-          makeHolding(pyStr(name), weight, {
-            ticker: item["ticker"],
-            country: item["bloombergIsoCountry"],
-            sector: truthy(item["gicsSectorDescription"])
-              ? item["gicsSectorDescription"]
-              : item["icbSectorDescription"],
-            asset_class: item["securityType"],
-          }),
-        );
-      }
+      answers.push(answer);
+      if (!truthy(profile)) profile = parsed.profile;
+      holdings.push(...parsed.holdings);
+      dates.push(...parsed.dates);
+      key = parsed.key;
       if (!truthy(key)) {
         finished = true;
         break;
@@ -178,12 +228,12 @@ export class VanguardIssuer implements Issuer {
     return {
       isin,
       issuer: this.name,
-      fund_name: (profile["fundFullName"] ?? null) as string | null,
+      fund_name: text(profile["fundFullName"]),
       as_of: dates.length > 0 ? dates.reduce((a, b) => (b > a ? b : a)) : null,
-      currency: (profile["fundCurrency"] ?? null) as string | null,
+      currency: text(profile["fundCurrency"]),
       source_url: GRAPHQL_URL,
-      fetched_at: nowUtc(),
-      stale,
+      fetched_at: fetchedAt(...answers),
+      stale: answers.some((a) => a.stale),
       holdings: requireHoldings(this.name, holdings),
     };
   }

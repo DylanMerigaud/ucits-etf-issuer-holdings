@@ -5,17 +5,19 @@ from __future__ import annotations
 from typing import Any
 
 from ..errors import IssuerUnavailable, NotListed
-from ..http import Transport
+from ..http import Response, Transport
 from ..models import Fund, Holding
 from .base import (
     HOLDINGS_TTL,
     INDEX_TTL,
-    call,
+    as_dict,
+    fetch_parsed,
+    fetched_at,
     make_holding,
-    now_utc,
     number,
     ok_json,
     require_holdings,
+    text,
     with_params,
 )
 
@@ -50,6 +52,69 @@ def _as_of(value: Any) -> str | None:
     return None
 
 
+def _parse_index(response: Response) -> dict[str, Any]:
+    index = ok_json("ishares", response)
+    if not isinstance(index, dict):
+        raise IssuerUnavailable("ishares", "the product index is not an object")
+    return index
+
+
+def _parse_holdings(response: Response) -> tuple[tuple[Holding, ...], str | None]:
+    """The holdings and the as-of date of a holdings component answer."""
+    node: Any = ok_json("ishares", response)
+    for key in (
+        "componentsByNameMap",
+        "holdings",
+        "containersByNameMap",
+        "all",
+        "dataPointsByNameMap",
+    ):
+        node = node.get(key) if isinstance(node, dict) else None
+    points: Any = node
+    names = as_dict(points.get("issueName")).get("value") if isinstance(points, dict) else None
+    weights = (
+        as_dict(points.get("holdingPercent")).get("value") if isinstance(points, dict) else None
+    )
+    if not isinstance(points, dict) or not isinstance(names, list) or not isinstance(weights, list):
+        raise IssuerUnavailable("ishares", "holdings path missing in the answer")
+
+    def column(key: str) -> list[Any]:
+        values = as_dict(points.get(key)).get("value")
+        values = values if isinstance(values, list) else []
+        return values + [None] * (len(names) - len(values))
+
+    columns = {
+        key: column(key)
+        for key in (
+            "isin",
+            "ticker",
+            "countryOfRisk",
+            "sectorName",
+            "marketCurrencyCode",
+            "assetClass",
+        )
+    }
+    holdings: list[Holding] = []
+    for position, name in enumerate(names):
+        weight = number(weights[position]) if position < len(weights) else None
+        if weight is None or name is None:
+            continue
+        holdings.append(
+            make_holding(
+                str(name),
+                weight,
+                isin=columns["isin"][position],
+                ticker=columns["ticker"][position],
+                country_name=columns["countryOfRisk"][position],
+                sector=columns["sectorName"][position],
+                currency=columns["marketCurrencyCode"][position],
+                asset_class=columns["assetClass"][position],
+            )
+        )
+    as_of = _as_of(as_dict(points.get("asOfDate")).get("value"))
+    return require_holdings("ishares", holdings), as_of
+
+
 class ISharesIssuer:
     """Adapter for iShares UCITS ETFs."""
 
@@ -57,10 +122,9 @@ class ISharesIssuer:
 
     def fetch(self, isin: str, http: Transport) -> Fund:
         """Look the ISIN up in the screener index, then read the holdings component."""
-        index_answer = call(self.name, http, "GET", INDEX_URL, params=INDEX_PARAMS, ttl=INDEX_TTL)
-        index = ok_json(self.name, index_answer)
-        if not isinstance(index, dict):
-            raise IssuerUnavailable(self.name, "the product index is not an object")
+        index_answer, index = fetch_parsed(
+            self.name, http, "GET", INDEX_URL, _parse_index, params=INDEX_PARAMS, ttl=INDEX_TTL
+        )
         entry = next(
             (
                 value
@@ -71,69 +135,33 @@ class ISharesIssuer:
         )
         if entry is None:
             raise NotListed(self.name, isin, "not in the iShares product index")
-        portfolio_id = str(_raw(entry.get("portfolioId")))
+        portfolio_id = _raw(entry.get("portfolioId"))
+        if isinstance(portfolio_id, bool) or not isinstance(portfolio_id, (str, int)):
+            raise IssuerUnavailable(self.name, "portfolioId missing for the fund")
+        if not str(portfolio_id).strip():
+            raise IssuerUnavailable(self.name, "portfolioId missing for the fund")
         params = {
             "appSubType": "ISHARES",
             "appType": "PRODUCT_PAGE",
             "component": "holdings",
             "locale": "en_GB",
-            "portfolioId": portfolio_id,
+            "portfolioId": str(portfolio_id),
             "targetSite": "ishares-uk",
             "userType": "individual",
             "excludeContent": "true",
             "includeConfig": "false",
         }
-        answer = call(self.name, http, "GET", HOLDINGS_URL, params=params, ttl=HOLDINGS_TTL)
-        data = ok_json(self.name, answer)
-        try:
-            points = data["componentsByNameMap"]["holdings"]["containersByNameMap"]["all"][
-                "dataPointsByNameMap"
-            ]
-            names = points["issueName"]["value"]
-            weights = points["holdingPercent"]["value"]
-        except (KeyError, TypeError) as exc:
-            raise IssuerUnavailable(self.name, "holdings path missing in the answer") from exc
-
-        def column(key: str) -> list[Any]:
-            values = (points.get(key) or {}).get("value")
-            return values if isinstance(values, list) else [None] * len(names)
-
-        columns = {
-            key: column(key)
-            for key in (
-                "isin",
-                "ticker",
-                "countryOfRisk",
-                "sectorName",
-                "marketCurrencyCode",
-                "assetClass",
-            )
-        }
-        holdings: list[Holding] = []
-        for position, name in enumerate(names):
-            weight = number(weights[position]) if position < len(weights) else None
-            if weight is None or name is None:
-                continue
-            holdings.append(
-                make_holding(
-                    str(name),
-                    weight,
-                    isin=columns["isin"][position],
-                    ticker=columns["ticker"][position],
-                    country_name=columns["countryOfRisk"][position],
-                    sector=columns["sectorName"][position],
-                    currency=columns["marketCurrencyCode"][position],
-                    asset_class=columns["assetClass"][position],
-                )
-            )
+        answer, (holdings, as_of) = fetch_parsed(
+            self.name, http, "GET", HOLDINGS_URL, _parse_holdings, params=params, ttl=HOLDINGS_TTL
+        )
         return Fund(
             isin=isin,
             issuer=self.name,
-            fund_name=_raw(entry.get("fundName")),
-            as_of=_as_of((points.get("asOfDate") or {}).get("value")),
-            currency=_raw(entry.get("seriesBaseCurrencyCode")),
+            fund_name=text(_raw(entry.get("fundName"))),
+            as_of=as_of,
+            currency=text(_raw(entry.get("seriesBaseCurrencyCode"))),
             source_url=with_params(HOLDINGS_URL, params),
-            fetched_at=now_utc(),
+            fetched_at=fetched_at(index_answer, answer),
             stale=index_answer.stale or answer.stale,
-            holdings=require_holdings(self.name, holdings),
+            holdings=holdings,
         )
