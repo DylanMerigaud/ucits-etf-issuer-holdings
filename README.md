@@ -25,7 +25,7 @@ npm install ucits-etf-issuer-holdings        # Node 20+, no runtime dependency
 ```python
 from ucits_etf_issuer_holdings import get_holdings
 
-fund = get_holdings("IE00B4L5Y983")   # iShares Core MSCI World
+fund = get_holdings("IE00B4L5Y983")  # iShares Core MSCI World
 print(fund.fund_name, fund.as_of, len(fund.holdings))
 for h in fund.top(3):
     print(f"{h.weight:6.2f}  {h.country}  {h.name}")
