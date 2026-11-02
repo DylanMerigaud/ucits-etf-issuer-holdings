@@ -77,3 +77,16 @@ def test_bad_option_exits(capsys: pytest.CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as info:
         main(["IE00B4L5Y983", "--format", "xml"])
     assert info.value.code == 2
+
+
+def test_a_given_transport_is_not_cached(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from ucits_etf_issuer_holdings import client as client_module
+
+    def refuse(*args: object, **kwargs: object) -> None:
+        raise AssertionError("the CLI must not cache a transport it was given")
+
+    monkeypatch.setattr(client_module, "CachingTransport", refuse)
+    code, out, _ = run(["IE000716YHJ7"], capsys)
+    assert code == 0 and json.loads(out)["issuer"] == "invesco"

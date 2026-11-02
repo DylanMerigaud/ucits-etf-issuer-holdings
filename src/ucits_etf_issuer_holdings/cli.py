@@ -12,7 +12,7 @@ from collections.abc import Sequence
 from . import __version__
 from .client import HoldingsClient
 from .errors import HoldingsError, InvalidISIN
-from .http import DEFAULT_CACHE_DIR, Transport
+from .http import Transport
 from .issuers import ORDER
 from .models import WEIGHT_KEYS, Fund
 
@@ -83,13 +83,10 @@ def _render(fund: Fund, fmt: str, by: str | None) -> str:
 def main(argv: Sequence[str] | None = None, *, transport: Transport | None = None) -> int:
     """Run the command line; returns the exit code (0 ok, 1 not found, 2 bad input)."""
     args = _parser().parse_args(argv)
-    client = HoldingsClient(
-        transport=transport,
-        cache_dir=None if args.no_cache else DEFAULT_CACHE_DIR,
-        timeout=30.0,
-    )
+    options = {"cache_dir": None} if args.no_cache else {}
     try:
-        fund = client.get(args.isin, issuer=args.issuer)
+        with HoldingsClient(transport=transport, timeout=30.0, **options) as client:
+            fund = client.get(args.isin, issuer=args.issuer)
     except InvalidISIN as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

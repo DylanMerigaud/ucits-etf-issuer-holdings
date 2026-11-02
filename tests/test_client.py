@@ -173,3 +173,45 @@ def test_fetched_at_is_the_oldest_answer_used(tmp_path: Path) -> None:
     later = HoldingsClient(transport=cache, cache_dir=None).get("IE00B4L5Y983", issuer="ishares")
     assert later.fetched_at == "2023-11-14T22:13:20Z"
     assert later.stale is False
+
+
+def test_cache_rule_custom_transport_without_cache_dir_is_not_cached() -> None:
+    assert not isinstance(HoldingsClient(transport=RecordedTransport())._http, CachingTransport)
+
+
+def test_cache_rule_explicit_default_cache_dir_means_cache() -> None:
+    from ucits_etf_issuer_holdings.http import DEFAULT_CACHE_DIR
+
+    same_path = Path(str(DEFAULT_CACHE_DIR))
+    for given in (DEFAULT_CACHE_DIR, same_path):
+        c = HoldingsClient(transport=RecordedTransport(), cache_dir=given)
+        assert isinstance(c._http, CachingTransport)
+
+
+def test_cache_rule_default_client_caches_and_none_never_does() -> None:
+    with HoldingsClient() as c:
+        assert isinstance(c._http, CachingTransport)
+    with HoldingsClient(cache_dir=None) as c:
+        assert not isinstance(c._http, CachingTransport)
+
+
+def test_close_closes_the_own_client_only() -> None:
+    c = HoldingsClient(cache_dir=None)
+    c.close()
+    assert c._own is not None and c._own._client.is_closed
+    transport = RecordedTransport()
+    with HoldingsClient(transport=transport) as mine:
+        assert mine._own is None
+
+
+def test_get_holdings_closes_its_client(monkeypatch: pytest.MonkeyPatch) -> None:
+    closed: list[bool] = []
+    monkeypatch.setattr(HoldingsClient, "close", lambda self: closed.append(True))
+    get_holdings("IE000716YHJ7", issuer="invesco", transport=recorded_transport())
+    assert closed == [True]
+
+
+def test_object_member_names_are_unknown_issuers() -> None:
+    for name in ("toString", "__class__", "get"):
+        with pytest.raises(ValueError):
+            client().get("IE00B4L5Y983", issuer=name)

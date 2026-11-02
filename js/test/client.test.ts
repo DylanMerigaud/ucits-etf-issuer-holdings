@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import {
   CachingTransport,
+  DEFAULT_CACHE_DIR,
   FundNotFound,
   HoldingsClient,
   InvalidISIN,
@@ -348,4 +349,12 @@ test("fetched_at is the oldest answer used", async () => {
   const later = await new HoldingsClient({ transport: cache, cacheDir: null }).get("IE00B4L5Y983", { issuer: "ishares" });
   assert.equal(later.fetched_at, "2023-11-14T22:13:20Z");
   assert.equal(later.stale, false);
+});
+
+test("cache rule: a custom transport is cached only with an explicit cacheDir, the default path included", async () => {
+  const http = (c: HoldingsClient) => (c as unknown as { http: unknown }).http;
+  assert.ok(!(http(new HoldingsClient({ transport: new RecordedTransport() })) instanceof CachingTransport));
+  assert.ok(http(new HoldingsClient({ transport: new RecordedTransport(), cacheDir: DEFAULT_CACHE_DIR })) instanceof CachingTransport);
+  assert.ok(http(new HoldingsClient()) instanceof CachingTransport);
+  assert.ok(!(http(new HoldingsClient({ cacheDir: null })) instanceof CachingTransport));
 });

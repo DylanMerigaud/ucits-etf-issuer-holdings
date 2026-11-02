@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from enum import Enum
 from pathlib import Path
+from types import TracebackType
 
 from .errors import FundNotFound, HoldingsError, IssuerUnavailable, NotListed
 from .http import DEFAULT_CACHE_DIR, CachingTransport, HttpxTransport, Transport
@@ -12,17 +14,26 @@ from .issuers import ISSUERS, ORDER
 from .models import Fund
 
 
+class _Default(Enum):
+    """Marks a `cache_dir` the caller did not pass."""
+
+    CACHE_DIR = "default"
+
+
 class HoldingsClient:
     """Fetches the holdings an issuer publishes for an ISIN.
 
-    With no `transport` the client uses httpx and, when `cache_dir` is set, an on-disk cache.
-    A transport you pass is used as it is, unless you also pass your own `cache_dir`.
+    With no `transport` the client uses httpx and an on-disk cache in `DEFAULT_CACHE_DIR`.
+    A transport you pass is used as it is, without a cache, unless you also pass a `cache_dir`
+    (any directory, the default one included). `cache_dir=None` never caches.
+
+    Use it as a context manager, or call `close()`, to release the connections it opened.
     """
 
     def __init__(
         self,
         transport: Transport | None = None,
-        cache_dir: str | Path | None = DEFAULT_CACHE_DIR,
+        cache_dir: str | Path | _Default | None = _Default.CACHE_DIR,
         issuers: Iterable[str] | None = None,
         timeout: float = 30.0,
     ) -> None:
@@ -31,11 +42,34 @@ class HoldingsClient:
         if unknown:
             raise ValueError(f"unknown issuer(s): {', '.join(unknown)}")
         self._names = names
-        base = transport if transport is not None else HttpxTransport(timeout=timeout)
-        if cache_dir is not None and (transport is None or cache_dir is not DEFAULT_CACHE_DIR):
+        self._own: HttpxTransport | None = None
+        base: Transport
+        if transport is None:
+            self._own = base = HttpxTransport(timeout=timeout)
+        else:
+            base = transport
+        if cache_dir is _Default.CACHE_DIR:
+            cache_dir = DEFAULT_CACHE_DIR if transport is None else None
+        if cache_dir is not None:
             self._http: Transport = CachingTransport(base, cache_dir)
         else:
             self._http = base
+
+    def close(self) -> None:
+        """Close the network client this object made (a transport you passed stays open)."""
+        if self._own is not None:
+            self._own.close()
+
+    def __enter__(self) -> HoldingsClient:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        self.close()
 
     def get(self, isin: str, issuer: str | None = None) -> Fund:
         """Return the fund for `isin`, asking only `issuer` when given.
@@ -71,9 +105,9 @@ def get_holdings(
     issuer: str | None = None,
     *,
     transport: Transport | None = None,
-    cache_dir: str | Path | None = DEFAULT_CACHE_DIR,
+    cache_dir: str | Path | _Default | None = _Default.CACHE_DIR,
     timeout: float = 30.0,
 ) -> Fund:
-    """One-call form of `HoldingsClient(...).get(isin, issuer)`."""
-    client = HoldingsClient(transport=transport, cache_dir=cache_dir, timeout=timeout)
-    return client.get(isin, issuer)
+    """One-call form of `HoldingsClient(...).get(isin, issuer)`; the client is closed after."""
+    with HoldingsClient(transport=transport, cache_dir=cache_dir, timeout=timeout) as client:
+        return client.get(isin, issuer)
