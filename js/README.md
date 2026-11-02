@@ -31,7 +31,7 @@ console.log(topHoldings(fund, 5).map((h) => `${h.name} ${h.weight}`));
 the call rejects with `FundNotFound`, whose `reasons` say why each one did not. Look-through over
 several funds: `lookThrough({ IE00B4L5Y983: 7000, IE00BK5BQT80: 3000 }, funds, "country")`.
 
-Command line: `npx ucits-holdings IE00B4L5Y983 --format table --by country`.
+Command line: `npx -p ucits-etf-issuer-holdings ucits-holdings IE00B4L5Y983 --format table --by country`.
 
 ## Offline
 
