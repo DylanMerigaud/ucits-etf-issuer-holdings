@@ -25,6 +25,7 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
 
   npm:
+    needs: pypi
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -43,4 +44,6 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
+      # trusted publishing through OIDC needs npm 11.5.1 or later
+      - run: npm install -g npm@latest
       - run: npm publish --provenance --access public
