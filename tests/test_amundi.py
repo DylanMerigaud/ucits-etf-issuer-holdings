@@ -23,7 +23,7 @@ def test_core_fund() -> None:
     assert (first.country, first.country_name) == ("US", "United States")
     assert first.sector == "Information Technology"
     assert first.currency == "USD"
-    assert first.asset_class == "EQUITY_ORDINARY"
+    assert (first.asset_class, first.asset_class_raw) == ("equity", "EQUITY_ORDINARY")
 
 
 def test_swap_fund() -> None:

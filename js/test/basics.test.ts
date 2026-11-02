@@ -70,7 +70,7 @@ test("errors: messages and hierarchy", () => {
 
 function makeFund(): Fund {
   const h = (name: string, weight: number, country: string | null, sector: string | null = null) => ({
-    name, weight, isin: null, ticker: null, country, country_name: null, sector, currency: null, asset_class: null,
+    name, weight, isin: null, ticker: null, country, country_name: null, sector, currency: null, asset_class: null, asset_class_raw: null,
   });
   return {
     isin: "IE00B4L5Y983", issuer: "ishares", fund_name: "Test", as_of: "2026-10-30", currency: "USD",

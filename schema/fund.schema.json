@@ -18,7 +18,7 @@
     "currency": { "type": ["string", "null"] },
     "source_url": { "type": "string" },
     "fetched_at": {
-      "description": "ISO 8601 UTC time the data was fetched.",
+      "description": "ISO 8601 UTC time the data was fetched from the issuer: for an answer served from the cache, the time it was stored; when several answers were used, the oldest.",
       "type": "string",
       "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
     },
@@ -32,7 +32,7 @@
     "holding": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "weight", "isin", "ticker", "country", "country_name", "sector", "currency", "asset_class"],
+      "required": ["name", "weight", "isin", "ticker", "country", "country_name", "sector", "currency", "asset_class", "asset_class_raw"],
       "properties": {
         "name": { "type": "string" },
         "weight": { "description": "Percent of the fund.", "type": "number" },
@@ -42,7 +42,14 @@
         "country_name": { "type": ["string", "null"] },
         "sector": { "type": ["string", "null"] },
         "currency": { "type": ["string", "null"] },
-        "asset_class": { "type": ["string", "null"] }
+        "asset_class": {
+          "description": "The asset class mapped to one vocabulary, null when the issuer gives none; a label the library does not know is other.",
+          "enum": ["equity", "fixed_income", "cash", "derivative", "fund", "real_estate", "commodity", "other", null]
+        },
+        "asset_class_raw": {
+          "description": "The issuer's own asset class label, as published.",
+          "type": ["string", "null"]
+        }
       }
     }
   }

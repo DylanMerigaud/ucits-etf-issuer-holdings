@@ -22,7 +22,11 @@ def test_equity_fund() -> None:
     assert (first.name, first.weight, first.isin) == ("APPLE", 5.6239, "US0378331005")
     assert (first.country, first.country_name) == ("US", "United States")
     assert first.ticker == "AAPL"
-    assert first.sector and first.currency == "USD" and first.asset_class == "Equity"
+    assert (
+        first.sector
+        and first.currency == "USD"
+        and (first.asset_class, first.asset_class_raw) == ("equity", "Equity")
+    )
     assert fund.holdings[17].country == "NL"
     assert "portfolioId=251882" in fund.source_url
 

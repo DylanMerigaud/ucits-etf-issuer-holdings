@@ -32,6 +32,7 @@ export function lookThrough(
           sector: h.sector,
           currency: h.currency,
           asset_class: h.asset_class,
+          asset_class_raw: h.asset_class_raw,
         }),
       );
     }

@@ -29,7 +29,7 @@ test("ishares: equity fund", async () => {
   assert.deepEqual([first.name, first.weight, first.isin], ["APPLE", 5.6239, "US0378331005"]);
   assert.deepEqual([first.country, first.country_name], ["US", "United States"]);
   assert.equal(first.ticker, "AAPL");
-  assert.ok(first.sector && first.currency === "USD" && first.asset_class === "Equity");
+  assert.ok(first.sector && first.currency === "USD" && first.asset_class === "equity" && first.asset_class_raw === "Equity");
   assert.equal(fund.holdings[17]!.country, "NL");
   assert.ok(fund.source_url.includes("portfolioId=251882"));
 });
@@ -112,7 +112,7 @@ test("vanguard: fund with two pages", async () => {
   assert.deepEqual([first.name, first.weight, first.ticker], ["NVIDIA Corp", 5.0056, "NVDA"]);
   assert.deepEqual([first.country, first.country_name], ["US", "United States"]);
   assert.equal(first.sector, "Information Technology");
-  assert.equal(first.asset_class, "EQ.STOCK");
+  assert.deepEqual([first.asset_class, first.asset_class_raw], ["equity", "EQ.STOCK"]);
   assert.equal(first.isin, null);
   assert.equal(t.requests.filter(([m]) => m === "POST").length, 3);
 });
@@ -174,7 +174,7 @@ test("xtrackers: fund", async () => {
   assert.deepEqual([first.country, first.country_name], ["DE", "Germany"]);
   assert.equal(first.currency, "EUR");
   assert.equal(first.sector, "Technology");
-  assert.equal(first.asset_class, "Equities");
+  assert.deepEqual([first.asset_class, first.asset_class_raw], ["equity", "Equities"]);
   assert.equal(fund.holdings[4]!.name, "AIRBUS");
   assert.equal(fund.holdings[4]!.country, "FR");
 });
@@ -184,7 +184,7 @@ test("xtrackers: cash lines have no isin or country", async () => {
   const euro = fund.holdings.find((h) => h.name === "EURO CURRENCY")!;
   assert.equal(euro.isin, null);
   assert.equal(euro.country, null);
-  assert.equal(euro.asset_class, "Cash");
+  assert.deepEqual([euro.asset_class, euro.asset_class_raw], ["cash", "Cash"]);
 });
 
 test("xtrackers: not listed when the answer is not an xlsx", async () => {
@@ -224,7 +224,7 @@ test("amundi: core fund", async () => {
   assert.deepEqual([first.country, first.country_name], ["US", "United States"]);
   assert.equal(first.sector, "Information Technology");
   assert.equal(first.currency, "USD");
-  assert.equal(first.asset_class, "EQUITY_ORDINARY");
+  assert.deepEqual([first.asset_class, first.asset_class_raw], ["equity", "EQUITY_ORDINARY"]);
 });
 
 test("amundi: swap fund", async () => {

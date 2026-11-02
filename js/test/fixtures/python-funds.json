@@ -17,7 +17,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "NVIDIA",
@@ -28,7 +29,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "MICROSOFT",
@@ -39,7 +41,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "AMAZON.COM INC",
@@ -50,7 +53,8 @@
         "country_name": "United States",
         "sector": "Consumer Discretionary",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "ALPHABET CLASS A",
@@ -61,7 +65,8 @@
         "country_name": "United States",
         "sector": "Communication",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "BROADCOM INC",
@@ -72,7 +77,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "META PLATFORMS CLASS A",
@@ -83,7 +89,8 @@
         "country_name": "United States",
         "sector": "Communication",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "ALPHABET CLASS C",
@@ -94,7 +101,8 @@
         "country_name": "United States",
         "sector": "Communication",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "TESLA INC",
@@ -105,7 +113,8 @@
         "country_name": "United States",
         "sector": "Consumer Discretionary",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "ELI LILLY",
@@ -116,7 +125,8 @@
         "country_name": "United States",
         "sector": "Health Care",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "MICRON TECHNOLOGY",
@@ -127,7 +137,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "JPMORGAN CHASE & CO",
@@ -138,7 +149,8 @@
         "country_name": "United States",
         "sector": "Financials",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "ADVANCED MICRO DEVICES",
@@ -149,7 +161,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "EXXONMOBIL HOLDINGS CORP",
@@ -160,7 +173,8 @@
         "country_name": "United States",
         "sector": "Energy",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "BERKSHIRE HATHAWAY INC CLASS B",
@@ -171,7 +185,8 @@
         "country_name": "United States",
         "sector": "Financials",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "VISA CLASS A",
@@ -182,7 +197,8 @@
         "country_name": "United States",
         "sector": "Financials",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "JOHNSON & JOHNSON",
@@ -193,7 +209,8 @@
         "country_name": "United States",
         "sector": "Health Care",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "ASML HOLDING",
@@ -204,7 +221,8 @@
         "country_name": "Netherlands",
         "sector": "Information Technology",
         "currency": "EUR",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "WALMART",
@@ -215,7 +233,8 @@
         "country_name": "United States",
         "sector": "Consumer Staples",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       },
       {
         "name": "MASTERCARD CLASS A",
@@ -226,7 +245,8 @@
         "country_name": "United States",
         "sector": "Financials",
         "currency": "USD",
-        "asset_class": "Equity"
+        "asset_class": "equity",
+        "asset_class_raw": "Equity"
       }
     ]
   },
@@ -248,7 +268,8 @@
         "country_name": "Ireland",
         "sector": "Cash and/or Derivatives",
         "currency": "USD",
-        "asset_class": "Money Market"
+        "asset_class": "cash",
+        "asset_class_raw": "Money Market"
       },
       {
         "name": "CHINA PEOPLES REPUBLIC OF (GOVERNM",
@@ -259,7 +280,8 @@
         "country_name": "China",
         "sector": "Treasuries",
         "currency": "CNY",
-        "asset_class": "Fixed Income"
+        "asset_class": "fixed_income",
+        "asset_class_raw": "Fixed Income"
       },
       {
         "name": "FHLMC 30YR UMBS SUPER",
@@ -270,7 +292,8 @@
         "country_name": "United States",
         "sector": "Agency Fixed Rate",
         "currency": "USD",
-        "asset_class": "Fixed Income"
+        "asset_class": "fixed_income",
+        "asset_class_raw": "Fixed Income"
       },
       {
         "name": "CHINA PEOPLES REPUBLIC OF (GOVERNM",
@@ -281,7 +304,8 @@
         "country_name": "China",
         "sector": "Treasuries",
         "currency": "CNY",
-        "asset_class": "Fixed Income"
+        "asset_class": "fixed_income",
+        "asset_class_raw": "Fixed Income"
       },
       {
         "name": "CHINA PEOPLES REPUBLIC OF (GOVERNM",
@@ -292,7 +316,8 @@
         "country_name": "China",
         "sector": "Treasuries",
         "currency": "CNY",
-        "asset_class": "Fixed Income"
+        "asset_class": "fixed_income",
+        "asset_class_raw": "Fixed Income"
       },
       {
         "name": "CHINA PEOPLES REPUBLIC OF (GOVERNM",
@@ -303,7 +328,8 @@
         "country_name": "China",
         "sector": "Treasuries",
         "currency": "CNY",
-        "asset_class": "Fixed Income"
+        "asset_class": "fixed_income",
+        "asset_class_raw": "Fixed Income"
       },
       {
         "name": "CHINA PEOPLES REPUBLIC OF (GOVERNM",
@@ -314,7 +340,8 @@
         "country_name": "China",
         "sector": "Treasuries",
         "currency": "CNY",
-        "asset_class": "Fixed Income"
+        "asset_class": "fixed_income",
+        "asset_class_raw": "Fixed Income"
       },
       {
         "name": "CHINA PEOPLES REPUBLIC OF (GOVERNM",
@@ -325,7 +352,8 @@
         "country_name": "China",
         "sector": "Treasuries",
         "currency": "CNY",
-        "asset_class": "Fixed Income"
+        "asset_class": "fixed_income",
+        "asset_class_raw": "Fixed Income"
       },
       {
         "name": "CHINA PEOPLES REPUBLIC OF (GOVERNM",
@@ -336,7 +364,8 @@
         "country_name": "China",
         "sector": "Treasuries",
         "currency": "CNY",
-        "asset_class": "Fixed Income"
+        "asset_class": "fixed_income",
+        "asset_class_raw": "Fixed Income"
       },
       {
         "name": "FNMA 30YR UMBS SUPER",
@@ -347,7 +376,8 @@
         "country_name": "United States",
         "sector": "Agency Fixed Rate",
         "currency": "USD",
-        "asset_class": "Fixed Income"
+        "asset_class": "fixed_income",
+        "asset_class_raw": "Fixed Income"
       },
       {
         "name": "CHINA PEOPLES REPUBLIC OF (GOVERNM",
@@ -358,7 +388,8 @@
         "country_name": "China",
         "sector": "Treasuries",
         "currency": "CNY",
-        "asset_class": "Fixed Income"
+        "asset_class": "fixed_income",
+        "asset_class_raw": "Fixed Income"
       },
       {
         "name": "CHINA PEOPLES REPUBLIC OF (GOVERNM",
@@ -369,7 +400,8 @@
         "country_name": "China",
         "sector": "Treasuries",
         "currency": "CNY",
-        "asset_class": "Fixed Income"
+        "asset_class": "fixed_income",
+        "asset_class_raw": "Fixed Income"
       }
     ]
   },
@@ -391,7 +423,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Apple Inc",
@@ -402,7 +435,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Microsoft Corp",
@@ -413,7 +447,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Amazon.com Inc",
@@ -424,7 +459,8 @@
         "country_name": "United States",
         "sector": "Consumer Discretionary",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Alphabet Inc",
@@ -435,7 +471,8 @@
         "country_name": "United States",
         "sector": "Communication Services",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Taiwan Semiconductor Manufacturing Co Ltd",
@@ -446,7 +483,8 @@
         "country_name": "Taiwan",
         "sector": "Information Technology",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Broadcom Inc",
@@ -457,7 +495,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Meta Platforms Inc",
@@ -468,7 +507,8 @@
         "country_name": "United States",
         "sector": "Communication Services",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Alphabet Inc",
@@ -479,7 +519,8 @@
         "country_name": "United States",
         "sector": "Communication Services",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Micron Technology Inc",
@@ -490,7 +531,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Tesla Inc",
@@ -501,7 +543,8 @@
         "country_name": "United States",
         "sector": "Consumer Discretionary",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Advanced Micro Devices Inc",
@@ -512,7 +555,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Eli Lilly & Co",
@@ -523,7 +567,8 @@
         "country_name": "United States",
         "sector": "Health Care",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Samsung Electronics Co Ltd",
@@ -534,7 +579,8 @@
         "country_name": "South Korea",
         "sector": "Information Technology",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "JPMorgan Chase & Co",
@@ -545,7 +591,8 @@
         "country_name": "United States",
         "sector": "Financials",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Idemitsu Kosan Co Ltd",
@@ -556,7 +603,8 @@
         "country_name": "Japan",
         "sector": "Energy",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Chang Hwa Commercial Bank Ltd",
@@ -567,7 +615,8 @@
         "country_name": "Taiwan",
         "sector": "Financials",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "SUMCO Corp",
@@ -578,7 +627,8 @@
         "country_name": "Japan",
         "sector": "Information Technology",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Lottery Corp Ltd/The",
@@ -589,7 +639,8 @@
         "country_name": "Australia",
         "sector": "Consumer Discretionary",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Croda International PLC",
@@ -600,7 +651,8 @@
         "country_name": "United Kingdom",
         "sector": "Materials",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Kesko Oyj",
@@ -611,7 +663,8 @@
         "country_name": "Finland",
         "sector": "Consumer Staples",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Ramsay Health Care Ltd",
@@ -622,7 +675,8 @@
         "country_name": "Australia",
         "sector": "Health Care",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Ricoh Co Ltd",
@@ -633,7 +687,8 @@
         "country_name": "Japan",
         "sector": "Information Technology",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Lupin Ltd",
@@ -644,7 +699,8 @@
         "country_name": "India",
         "sector": "Health Care",
         "currency": null,
-        "asset_class": "EQ.STOCK"
+        "asset_class": "equity",
+        "asset_class_raw": "EQ.STOCK"
       },
       {
         "name": "Australian Dollar",
@@ -655,7 +711,8 @@
         "country_name": "Australia",
         "sector": null,
         "currency": null,
-        "asset_class": "CRNY"
+        "asset_class": "cash",
+        "asset_class_raw": "CRNY"
       }
     ]
   },
@@ -677,7 +734,8 @@
         "country_name": "Germany",
         "sector": "Technology",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "SIEMENS N AG",
@@ -688,7 +746,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "ALLIANZ",
@@ -699,7 +758,8 @@
         "country_name": "Germany",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "SIEMENS ENERGY N AG",
@@ -710,7 +770,8 @@
         "country_name": "Germany",
         "sector": "Energy",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "AIRBUS",
@@ -721,7 +782,8 @@
         "country_name": "France",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "DEUTSCHE TELEKOM N AG",
@@ -732,7 +794,8 @@
         "country_name": "Germany",
         "sector": "Telecommunications",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "MUENCHENER RUECKVERSICHERUNGS-GESE",
@@ -743,7 +806,8 @@
         "country_name": "Germany",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "INFINEON TECHNOLOGIES AG",
@@ -754,7 +818,8 @@
         "country_name": "Germany",
         "sector": "Technology",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "DEUTSCHE BANK AG",
@@ -765,7 +830,8 @@
         "country_name": "Germany",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "DEUTSCHE BOERSE AG",
@@ -776,7 +842,8 @@
         "country_name": "Germany",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "DHL N AG",
@@ -787,7 +854,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "RHEINMETALL AG",
@@ -798,7 +866,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "BASF N",
@@ -809,7 +878,8 @@
         "country_name": "Germany",
         "sector": "Basic Materials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "BAYER AG",
@@ -820,7 +890,8 @@
         "country_name": "Germany",
         "sector": "Health Care",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "E.ON N",
@@ -831,7 +902,8 @@
         "country_name": "Germany",
         "sector": "Utilities",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "RWE AG",
@@ -842,7 +914,8 @@
         "country_name": "Germany",
         "sector": "Utilities",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "ADIDAS N AG",
@@ -853,7 +926,8 @@
         "country_name": "Germany",
         "sector": "Consumer Discretionary",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "MERCEDES-BENZ GROUP N AG",
@@ -864,7 +938,8 @@
         "country_name": "Germany",
         "sector": "Consumer Staples",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "DAIMLER TRUCK HOLDING E AG",
@@ -875,7 +950,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "MERCK",
@@ -886,7 +962,8 @@
         "country_name": "Germany",
         "sector": "Health Care",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "FRESENIUS N",
@@ -897,7 +974,8 @@
         "country_name": "Germany",
         "sector": "unknown",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "BMW",
@@ -908,7 +986,8 @@
         "country_name": "Germany",
         "sector": "Consumer Staples",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "HEIDELBERG MATERIALS AG",
@@ -919,7 +998,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "MTU AERO ENGINES HOLDING AG",
@@ -930,7 +1010,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "HANNOVER RUECK",
@@ -941,7 +1022,8 @@
         "country_name": "Germany",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "SIEMENS HEALTHINEERS AG",
@@ -952,7 +1034,8 @@
         "country_name": "Germany",
         "sector": "Health Care",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "COMMERZBANK AG",
@@ -963,7 +1046,8 @@
         "country_name": "Germany",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "VOLKSWAGEN NON-VOTING PREF AG",
@@ -974,7 +1058,8 @@
         "country_name": "Germany",
         "sector": "Consumer Staples",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "SYMRISE AG",
@@ -985,7 +1070,8 @@
         "country_name": "Germany",
         "sector": "Basic Materials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "HENKEL & KGAA PREF AG",
@@ -996,7 +1082,8 @@
         "country_name": "Germany",
         "sector": "Consumer Discretionary",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "VONOVIA",
@@ -1007,7 +1094,8 @@
         "country_name": "Germany",
         "sector": "Real Estate",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "GEA GROUP AG",
@@ -1018,7 +1106,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "QIAGEN",
@@ -1029,7 +1118,8 @@
         "country_name": "Netherlands",
         "sector": "unknown",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "FRESENIUS MEDICAL CARE AG",
@@ -1040,7 +1130,8 @@
         "country_name": "Germany",
         "sector": "Health Care",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "CONTINENTAL AG",
@@ -1051,7 +1142,8 @@
         "country_name": "Germany",
         "sector": "Consumer Staples",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "BRENNTAG",
@@ -1062,7 +1154,8 @@
         "country_name": "Germany",
         "sector": "Basic Materials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "BEIERSDORF AG",
@@ -1073,7 +1166,8 @@
         "country_name": "Germany",
         "sector": "Consumer Discretionary",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "HOCHTIEF AG",
@@ -1084,7 +1178,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "ZALANDO",
@@ -1095,7 +1190,8 @@
         "country_name": "Germany",
         "sector": "Consumer Discretionary",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "SCOUT24 N",
@@ -1106,7 +1202,8 @@
         "country_name": "Germany",
         "sector": "Technology",
         "currency": "EUR",
-        "asset_class": "Equities"
+        "asset_class": "equity",
+        "asset_class_raw": "Equities"
       },
       {
         "name": "EURO CURRENCY",
@@ -1117,7 +1214,8 @@
         "country_name": null,
         "sector": "unknown",
         "currency": "EUR",
-        "asset_class": "Cash"
+        "asset_class": "cash",
+        "asset_class_raw": "Cash"
       },
       {
         "name": "US DOLLAR",
@@ -1128,7 +1226,8 @@
         "country_name": "United States",
         "sector": "unknown",
         "currency": "USD",
-        "asset_class": "Cash"
+        "asset_class": "cash",
+        "asset_class_raw": "Cash"
       },
       {
         "name": "DEUTSCHE GLOBAL LIQUIDITY SERI",
@@ -1139,7 +1238,8 @@
         "country_name": "Ireland",
         "sector": "unknown",
         "currency": "USD",
-        "asset_class": "Mutual Fund"
+        "asset_class": "fund",
+        "asset_class_raw": "Mutual Fund"
       }
     ]
   },
@@ -1161,7 +1261,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "NVIDIA CORP",
@@ -1172,7 +1273,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "MICROSOFT CORP",
@@ -1183,7 +1285,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "AMAZON.COM INC",
@@ -1194,7 +1297,8 @@
         "country_name": "United States",
         "sector": "Consumer Discretionary",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "ALPHABET INC CL A",
@@ -1205,7 +1309,8 @@
         "country_name": "United States",
         "sector": "Communication Services",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "BROADCOM INC",
@@ -1216,7 +1321,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "META PLATFORMS INC-CLASS A",
@@ -1227,7 +1333,8 @@
         "country_name": "United States",
         "sector": "Communication Services",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "ALPHABET INC CL C",
@@ -1238,7 +1345,8 @@
         "country_name": "United States",
         "sector": "Communication Services",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "TESLA INC",
@@ -1249,7 +1357,8 @@
         "country_name": "United States",
         "sector": "Consumer Discretionary",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "ELI LILLY & CO",
@@ -1260,7 +1369,8 @@
         "country_name": "United States",
         "sector": "Health Care",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "MICRON TECHNOLOGY INC",
@@ -1271,7 +1381,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "ADVANCED MICRO DEVICES",
@@ -1282,7 +1393,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "JPMORGAN CHASE & CO",
@@ -1293,7 +1405,8 @@
         "country_name": "United States",
         "sector": "Financials",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "BERKSHIRE HATHAWAY INC-CL B",
@@ -1304,7 +1417,8 @@
         "country_name": "United States",
         "sector": "Financials",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "EXXONMOBIL HOLDINGS CORP",
@@ -1315,7 +1429,8 @@
         "country_name": "United States",
         "sector": "Energy",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "VISA INC-CLASS A SHARES",
@@ -1326,7 +1441,8 @@
         "country_name": "United States",
         "sector": "Financials",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "JOHNSON & JOHNSON",
@@ -1337,7 +1453,8 @@
         "country_name": "United States",
         "sector": "Health Care",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "ASML HOLDING NV",
@@ -1348,7 +1465,8 @@
         "country_name": "Netherlands",
         "sector": "Information Technology",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "WALMART INC",
@@ -1359,7 +1477,8 @@
         "country_name": "United States",
         "sector": "Consumer Staples",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "MASTERCARD INC-CL A",
@@ -1370,7 +1489,8 @@
         "country_name": "United States",
         "sector": "Financials",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       }
     ]
   },
@@ -1392,7 +1512,8 @@
         "country_name": "France",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "SIEMENS ENERGY AG",
@@ -1403,7 +1524,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "DEUTSCHE TELEKOM NAMEN (XETRA)",
@@ -1414,7 +1536,8 @@
         "country_name": "Germany",
         "sector": "Communication Services",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "BAYER AG-REG",
@@ -1425,7 +1548,8 @@
         "country_name": "Germany",
         "sector": "Health Care",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "INFINEON TECHNOLOGIES AG",
@@ -1436,7 +1560,8 @@
         "country_name": "Germany",
         "sector": "Information Technology",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "ALLIANZ SE-REG",
@@ -1447,7 +1572,8 @@
         "country_name": "Germany",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "SIEMENS AG-REG",
@@ -1458,7 +1584,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "NVIDIA CORP",
@@ -1469,7 +1596,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "ASML HOLDING NV",
@@ -1480,7 +1608,8 @@
         "country_name": "Netherlands",
         "sector": "Information Technology",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "ING GROEP NV",
@@ -1491,7 +1620,8 @@
         "country_name": "Netherlands",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "APPLE INC",
@@ -1502,7 +1632,8 @@
         "country_name": "United States",
         "sector": "Information Technology",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "DHL GROUP (XETRA)",
@@ -1513,7 +1644,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "ALPHABET INC CL C",
@@ -1524,7 +1656,8 @@
         "country_name": "United States",
         "sector": "Communication Services",
         "currency": "USD",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "ASM INTERNATIONAL NV",
@@ -1535,7 +1668,8 @@
         "country_name": "Netherlands",
         "sector": "Information Technology",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "TOTALENERGIES SE PARIS",
@@ -1546,7 +1680,8 @@
         "country_name": "France",
         "sector": "Energy",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "ARCELORMITTAL SA AMSTERDAM",
@@ -1557,7 +1692,8 @@
         "country_name": "Luxembourg",
         "sector": "Materials",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "SANOFI - PARIS",
@@ -1568,7 +1704,8 @@
         "country_name": "United States",
         "sector": "Health Care",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "PKO BANK POLSKI",
@@ -1579,7 +1716,8 @@
         "country_name": "Poland",
         "sector": "Financials",
         "currency": "PLN",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "NOVO NORDISK A/S-B",
@@ -1590,7 +1728,8 @@
         "country_name": "Denmark",
         "sector": "Health Care",
         "currency": "DKK",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       },
       {
         "name": "RWE AG",
@@ -1601,7 +1740,8 @@
         "country_name": "Germany",
         "sector": "Utilities",
         "currency": "EUR",
-        "asset_class": "EQUITY_ORDINARY"
+        "asset_class": "equity",
+        "asset_class_raw": "EQUITY_ORDINARY"
       }
     ]
   },
@@ -1623,7 +1763,8 @@
         "country_name": "France",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Hannover Rueck SE",
@@ -1634,7 +1775,8 @@
         "country_name": "Germany",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "OMV Aktiengesellschaft",
@@ -1645,7 +1787,8 @@
         "country_name": "Austria",
         "sector": "Energy",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Munchener Ruckversicherungs-Gesellschaft AG",
@@ -1656,7 +1799,8 @@
         "country_name": "Germany",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "ageas SA/NV",
@@ -1667,7 +1811,8 @@
         "country_name": "Belgium",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "UNIPOL ASSICURAZIONI SPA",
@@ -1678,7 +1823,8 @@
         "country_name": "Italy",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "NN Group N.V.",
@@ -1689,7 +1835,8 @@
         "country_name": "Netherlands",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Sanofi SA",
@@ -1700,7 +1847,8 @@
         "country_name": "France",
         "sector": "Health Care",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Wolters Kluwer N.V.",
@@ -1711,7 +1859,8 @@
         "country_name": "Netherlands",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Valmet Corp",
@@ -1722,7 +1871,8 @@
         "country_name": "Finland",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "UPM-Kymmene Oyj",
@@ -1733,7 +1883,8 @@
         "country_name": "Finland",
         "sector": "Materials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Allianz SE",
@@ -1744,7 +1895,8 @@
         "country_name": "Germany",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "EDP S.A.",
@@ -1755,7 +1907,8 @@
         "country_name": "Portugal",
         "sector": "Utilities",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "A2A S.p.A.",
@@ -1766,7 +1919,8 @@
         "country_name": "Italy",
         "sector": "Utilities",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Elisa Oyj Class A",
@@ -1777,7 +1931,8 @@
         "country_name": "Finland",
         "sector": "Communication Services",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Talanx AG",
@@ -1788,7 +1943,8 @@
         "country_name": "Germany",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Poste Italiane SpA",
@@ -1799,7 +1955,8 @@
         "country_name": "Italy",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Assicurazioni Generali S.p.A.",
@@ -1810,7 +1967,8 @@
         "country_name": "Italy",
         "sector": "Financials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "DHL AG",
@@ -1821,7 +1979,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Bouygues SA",
@@ -1832,7 +1991,8 @@
         "country_name": "France",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Hera S.p.A.",
@@ -1843,7 +2003,8 @@
         "country_name": "Italy",
         "sector": "Utilities",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Royal KPN NV",
@@ -1854,7 +2015,8 @@
         "country_name": "Netherlands",
         "sector": "Communication Services",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "KONE Oyj Class B",
@@ -1865,7 +2027,8 @@
         "country_name": "Finland",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Terna S.p.A.",
@@ -1876,7 +2039,8 @@
         "country_name": "Italy",
         "sector": "Utilities",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Iberdrola SA",
@@ -1887,7 +2051,8 @@
         "country_name": "Spain",
         "sector": "Utilities",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Warehouses De Pauw SA",
@@ -1898,7 +2063,8 @@
         "country_name": "Belgium",
         "sector": "Real Estate",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Orion Oyj Class B",
@@ -1909,7 +2075,8 @@
         "country_name": "Finland",
         "sector": "Health Care",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Henkel AG & Co. KGaA",
@@ -1920,7 +2087,8 @@
         "country_name": "Germany",
         "sector": "Consumer Staples",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Koninklijke Ahold Delhaize N.V.",
@@ -1931,7 +2099,8 @@
         "country_name": "Netherlands",
         "sector": "Consumer Staples",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Huhtamaki Oyj",
@@ -1942,7 +2111,8 @@
         "country_name": "Finland",
         "sector": "Materials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "GEA Group Aktiengesellschaft",
@@ -1953,7 +2123,8 @@
         "country_name": "Germany",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Wienerberger AG",
@@ -1964,7 +2135,8 @@
         "country_name": "Austria",
         "sector": "Materials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Royal Vopak NV",
@@ -1975,7 +2147,8 @@
         "country_name": "Netherlands",
         "sector": "Energy",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Recordati S.p.A.",
@@ -1986,7 +2159,8 @@
         "country_name": "Italy",
         "sector": "Health Care",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "ERG S.p.A.",
@@ -1997,7 +2171,8 @@
         "country_name": "Italy",
         "sector": "Utilities",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Logista Integral S.A.",
@@ -2008,7 +2183,8 @@
         "country_name": "Spain",
         "sector": "Industrials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Rubis SCA",
@@ -2019,7 +2195,8 @@
         "country_name": "France",
         "sector": "Utilities",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Bechtle AG",
@@ -2030,7 +2207,8 @@
         "country_name": "Germany",
         "sector": "Information Technology",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "FUCHS SE Pref Registered Shs",
@@ -2041,7 +2219,8 @@
         "country_name": "Germany",
         "sector": "Materials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Kemira Oyj",
@@ -2052,7 +2231,8 @@
         "country_name": "Finland",
         "sector": "Materials",
         "currency": "EUR",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       }
     ]
   },
@@ -2074,7 +2254,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "NVIDIA CORP USD0.001",
@@ -2085,7 +2266,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "MICROSOFT CORP USD0.00000625",
@@ -2096,7 +2278,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "AMAZON.COM INC USD0.01",
@@ -2107,7 +2290,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "TAIWAN SEMICONDUCTOR MANUFAC TWD10",
@@ -2118,7 +2302,8 @@
         "country_name": null,
         "sector": null,
         "currency": "TWD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "ALPHABET INC-CL A USD0.001",
@@ -2129,7 +2314,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "BROADCOM INC NPV",
@@ -2140,7 +2326,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "Meta Platforms INC USD0.000006",
@@ -2151,7 +2338,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "ALPHABET INC-CL C USD0.001",
@@ -2162,7 +2350,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "TESLA INC USD0.001",
@@ -2173,7 +2362,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "ELI LILLY & CO NPV",
@@ -2184,7 +2374,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "MICRON TECHNOLOGY INC USD0.1",
@@ -2195,7 +2386,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "JPMORGAN CHASE & CO USD1",
@@ -2206,7 +2398,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "SAMSUNG ELECTRONICS CO LTD KRW100",
@@ -2217,7 +2410,8 @@
         "country_name": null,
         "sector": null,
         "currency": "KRW",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "ADVANCED MICRO DEVICES USD0.01",
@@ -2228,7 +2422,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "BERKSHIRE HATHAWAY INC-CL B USD0.0033",
@@ -2239,7 +2434,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "EXXONMOBIL HLDIGS COM USD NPV",
@@ -2250,7 +2446,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "VISA INC-CLASS A SHARES USD0.0001",
@@ -2261,7 +2458,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "JOHNSON & JOHNSON USD1",
@@ -2272,7 +2470,8 @@
         "country_name": null,
         "sector": null,
         "currency": "USD",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       },
       {
         "name": "SK HYNIX INC KRW5000",
@@ -2283,7 +2482,8 @@
         "country_name": null,
         "sector": null,
         "currency": "KRW",
-        "asset_class": null
+        "asset_class": null,
+        "asset_class_raw": null
       }
     ]
   }

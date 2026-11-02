@@ -47,6 +47,7 @@ function parse(response: HttpResponse, isin: string): [Obj, Holding[], string | 
         sector: item["sector"],
         currency: item["currency"],
         asset_class: item["type"],
+        issuer: "amundi",
       }),
     );
   }

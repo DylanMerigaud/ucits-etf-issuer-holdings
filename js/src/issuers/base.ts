@@ -2,6 +2,7 @@ import { nameOf, toIso2 } from "../countries.js";
 import { IssuerUnavailable, NotListed, TransportError } from "../errors.js";
 import type { HttpResponse, RequestOptions, Transport } from "../http.js";
 import { makeHoldingObject, type Fund, type Holding } from "../models.js";
+import { normalizeAssetClass } from "./assetClasses.js";
 
 /** Seconds an index answer (a fund list) may be cached. */
 export const INDEX_TTL = 24 * 3600;
@@ -78,7 +79,9 @@ export interface HoldingFields {
   country_name?: unknown;
   sector?: unknown;
   currency?: unknown;
+  /** The issuer's own label, mapped to the vocabulary for `issuer`. */
   asset_class?: unknown;
+  issuer?: string;
 }
 
 /** Build a Holding, filling `country` from the name or `country_name` from the code. */
@@ -97,7 +100,8 @@ export function makeHolding(name: string, weight: number, fields: HoldingFields 
     country_name: label,
     sector: clean(fields.sector),
     currency: clean(fields.currency),
-    asset_class: clean(fields.asset_class),
+    asset_class: normalizeAssetClass(fields.issuer ?? "", clean(fields.asset_class)),
+    asset_class_raw: clean(fields.asset_class),
   });
 }
 

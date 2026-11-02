@@ -12,9 +12,11 @@ from .errors import (
     TransportError,
 )
 from .look_through import look_through
-from .models import Fund, Holding
+from .models import ASSET_CLASSES, WEIGHT_KEYS, Fund, Holding
 
 __all__ = [
+    "ASSET_CLASSES",
+    "WEIGHT_KEYS",
     "Fund",
     "FundNotFound",
     "Holding",

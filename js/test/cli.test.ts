@@ -24,7 +24,7 @@ test("csv", async () => {
   assert.equal(code, 0);
   const lines = out.trimEnd().split("\n");
   assert.equal(lines.length, 21);
-  assert.equal(lines[0], "name,weight,isin,ticker,country,country_name,sector,currency,asset_class");
+  assert.equal(lines[0], "name,weight,isin,ticker,country,country_name,sector,currency,asset_class,asset_class_raw");
   assert.ok(lines[1]!.startsWith("APPLE INC USD0.00001,4.74,US0378331005"));
 });
 

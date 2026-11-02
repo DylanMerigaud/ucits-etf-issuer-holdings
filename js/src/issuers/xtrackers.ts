@@ -53,6 +53,7 @@ function parse(response: HttpResponse, isin: string): [Holding[], string | null]
         sector: column(row, "Industry Classification"),
         currency: column(row, "Currency"),
         asset_class: column(row, "Type of Security"),
+        issuer: "xtrackers",
       }),
     );
   }

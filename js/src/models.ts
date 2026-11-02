@@ -6,6 +6,29 @@ export type WeightKey = "country" | "sector" | "currency" | "asset_class";
 /** The fields a holdings list can be grouped by, as a list. */
 export const WEIGHT_KEYS: readonly WeightKey[] = ["country", "sector", "currency", "asset_class"];
 
+/** The values `Holding.asset_class` takes (null when the issuer gives no class). */
+export type AssetClass =
+  | "equity"
+  | "fixed_income"
+  | "cash"
+  | "derivative"
+  | "fund"
+  | "real_estate"
+  | "commodity"
+  | "other";
+
+/** The values `Holding.asset_class` takes, as a list. */
+export const ASSET_CLASSES: readonly AssetClass[] = [
+  "equity",
+  "fixed_income",
+  "cash",
+  "derivative",
+  "fund",
+  "real_estate",
+  "commodity",
+  "other",
+];
+
 /** One line of a fund. `weight` is a percent of the fund. */
 export interface Holding {
   name: string;
@@ -17,7 +40,10 @@ export interface Holding {
   country_name: string | null;
   sector: string | null;
   currency: string | null;
+  /** One of {@link ASSET_CLASSES}, or null when the issuer gives no class. */
   asset_class: string | null;
+  /** The issuer's own asset class label. */
+  asset_class_raw: string | null;
 }
 
 /** The holdings an issuer publishes for one fund, in the library's one JSON shape. */
@@ -53,6 +79,7 @@ export function makeHoldingObject(
     sector: fields.sector ?? null,
     currency: fields.currency ?? null,
     asset_class: fields.asset_class ?? null,
+    asset_class_raw: fields.asset_class_raw ?? null,
   };
 }
 

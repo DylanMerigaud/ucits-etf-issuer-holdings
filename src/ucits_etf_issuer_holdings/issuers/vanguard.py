@@ -168,6 +168,7 @@ def _parse_holdings(response: Response) -> _Page:
                 country=item.get("bloombergIsoCountry"),
                 sector=item.get("gicsSectorDescription") or item.get("icbSectorDescription"),
                 asset_class=item.get("securityType"),
+                issuer="vanguard",
             )
         )
     return _Page(as_dict(profile.get("profile")), holdings, dates, block.get("lastItemKey"))

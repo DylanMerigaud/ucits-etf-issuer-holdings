@@ -159,6 +159,7 @@ function parseHoldings(response: HttpResponse): Page {
           ? item["gicsSectorDescription"]
           : item["icbSectorDescription"],
         asset_class: item["securityType"],
+        issuer: "vanguard",
       }),
     );
   }

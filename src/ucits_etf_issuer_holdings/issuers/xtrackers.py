@@ -57,6 +57,7 @@ def _parse(response: Response, isin: str) -> tuple[tuple[Holding, ...], str | No
                 sector=column(row, "Industry Classification"),
                 currency=column(row, "Currency"),
                 asset_class=column(row, "Type of Security"),
+                issuer="xtrackers",
             )
         )
     return require_holdings("xtrackers", holdings), iso_date(sheet_name)

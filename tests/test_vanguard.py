@@ -23,7 +23,7 @@ def test_fund_with_two_pages() -> None:
     assert (first.name, first.weight, first.ticker) == ("NVIDIA Corp", 5.0056, "NVDA")
     assert (first.country, first.country_name) == ("US", "United States")
     assert first.sector == "Information Technology"
-    assert first.asset_class == "EQ.STOCK"
+    assert (first.asset_class, first.asset_class_raw) == ("equity", "EQ.STOCK")
     assert first.isin is None
     posts = [r for r in transport.requests if r[0] == "POST"]
     assert len(posts) == 3  # funds lookup, two holdings pages

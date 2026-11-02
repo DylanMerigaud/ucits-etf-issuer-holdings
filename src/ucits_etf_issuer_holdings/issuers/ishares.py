@@ -109,6 +109,7 @@ def _parse_holdings(response: Response) -> tuple[tuple[Holding, ...], str | None
                 sector=columns["sectorName"][position],
                 currency=columns["marketCurrencyCode"][position],
                 asset_class=columns["assetClass"][position],
+                issuer="ishares",
             )
         )
     as_of = _as_of(as_dict(points.get("asOfDate")).get("value"))

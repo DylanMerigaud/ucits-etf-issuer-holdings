@@ -26,6 +26,7 @@ HOLDING_COLUMNS = (
     "sector",
     "currency",
     "asset_class",
+    "asset_class_raw",
 )
 
 

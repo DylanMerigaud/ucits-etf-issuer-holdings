@@ -17,6 +17,7 @@ const HOLDING_COLUMNS = [
   "sector",
   "currency",
   "asset_class",
+  "asset_class_raw",
 ] as const;
 
 const USAGE = `usage: ucits-holdings [-h] [--issuer {${ISSUER_ORDER.join(",")}}]

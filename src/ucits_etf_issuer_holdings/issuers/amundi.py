@@ -59,6 +59,7 @@ def _parse(response: Response, isin: str) -> tuple[dict[str, Any], tuple[Holding
                 sector=item.get("sector"),
                 currency=item.get("currency"),
                 asset_class=item.get("type"),
+                issuer="amundi",
             )
         )
     return product, require_holdings("amundi", holdings), max(dates) if dates else None

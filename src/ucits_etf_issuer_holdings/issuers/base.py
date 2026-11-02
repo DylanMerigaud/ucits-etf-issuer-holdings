@@ -12,6 +12,7 @@ from .. import countries
 from ..errors import IssuerUnavailable, NotListed, TransportError
 from ..http import CachingTransport, Response, Transport, Validate
 from ..models import Fund, Holding
+from .asset_classes import normalize_asset_class
 
 T = TypeVar("T")
 
@@ -95,8 +96,12 @@ def make_holding(
     sector: Any = None,
     currency: Any = None,
     asset_class: Any = None,
+    issuer: str = "",
 ) -> Holding:
-    """Build a Holding, filling `country` from the name or `country_name` from the code."""
+    """Build a Holding, filling `country` from the name or `country_name` from the code.
+
+    `asset_class` is the issuer's own label; it is mapped to the vocabulary for `issuer`.
+    """
     code = countries.to_iso2(clean(country)) if country is not None else None
     label = clean(country_name)
     if code is None and label is not None:
@@ -112,7 +117,8 @@ def make_holding(
         country_name=label,
         sector=clean(sector),
         currency=clean(currency),
-        asset_class=clean(asset_class),
+        asset_class=normalize_asset_class(issuer, clean(asset_class)),
+        asset_class_raw=clean(asset_class),
     )
 
 

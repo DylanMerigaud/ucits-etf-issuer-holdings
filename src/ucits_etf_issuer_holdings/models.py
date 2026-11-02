@@ -9,10 +9,26 @@ from typing import Any
 
 WEIGHT_KEYS = ("country", "sector", "currency", "asset_class")
 
+# The values `Holding.asset_class` takes (None when the issuer gives no class).
+ASSET_CLASSES = (
+    "equity",
+    "fixed_income",
+    "cash",
+    "derivative",
+    "fund",
+    "real_estate",
+    "commodity",
+    "other",
+)
+
 
 @dataclass(frozen=True)
 class Holding:
-    """One line of a fund. `weight` is a percent of the fund."""
+    """One line of a fund. `weight` is a percent of the fund.
+
+    `asset_class` is one of `ASSET_CLASSES` (None when the issuer gives none);
+    `asset_class_raw` is the issuer's own label.
+    """
 
     name: str
     weight: float
@@ -23,6 +39,7 @@ class Holding:
     sector: str | None = None
     currency: str | None = None
     asset_class: str | None = None
+    asset_class_raw: str | None = None
 
 
 @dataclass(frozen=True)

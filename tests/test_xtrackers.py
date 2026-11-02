@@ -24,7 +24,7 @@ def test_fund() -> None:
     assert (first.country, first.country_name) == ("DE", "Germany")
     assert first.currency == "EUR"
     assert first.sector == "Technology"
-    assert first.asset_class == "Equities"
+    assert (first.asset_class, first.asset_class_raw) == ("equity", "Equities")
     assert fund.holdings[4].name == "AIRBUS"
     assert fund.holdings[4].country == "FR"
 
@@ -34,7 +34,7 @@ def test_cash_lines_have_no_isin_or_country_dash() -> None:
     euro = next(h for h in fund.holdings if h.name == "EURO CURRENCY")
     assert euro.isin is None
     assert euro.country is None
-    assert euro.asset_class == "Cash"
+    assert (euro.asset_class, euro.asset_class_raw) == ("cash", "Cash")
 
 
 def test_not_listed_when_answer_is_not_an_xlsx() -> None:

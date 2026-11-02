@@ -83,6 +83,7 @@ function parseHoldings(response: HttpResponse): [Holding[], string | null] {
         sector: sectors[position],
         currency: currencies[position],
         asset_class: classes[position],
+        issuer: "ishares",
       }),
     );
   });

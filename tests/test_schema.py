@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 from jsonschema import Draft202012Validator
 
-from ucits_etf_issuer_holdings import HoldingsClient
+from ucits_etf_issuer_holdings import ASSET_CLASSES, HoldingsClient
 from ucits_etf_issuer_holdings.testing import RECORDED_ISINS, recorded_transport
 
 SCHEMA = json.loads((Path(__file__).parent.parent / "schema/fund.schema.json").read_text())
@@ -36,3 +36,20 @@ def test_bad_documents_fail() -> None:
     data = fund.to_dict()
     data["holdings"][0]["country"] = "usa"
     assert not validator.is_valid(data)
+    data = fund.to_dict()
+    data["holdings"][0]["asset_class"] = "Equity"
+    assert not validator.is_valid(data)
+
+
+def test_schema_asset_classes_match_the_vocabulary() -> None:
+    enum = SCHEMA["$defs"]["holding"]["properties"]["asset_class"]["enum"]
+    assert enum == [*ASSET_CLASSES, None]
+
+
+def test_schema_holding_keys_match_the_dataclass() -> None:
+    from dataclasses import fields
+
+    from ucits_etf_issuer_holdings import Holding
+
+    keys = [f.name for f in fields(Holding)]
+    assert SCHEMA["$defs"]["holding"]["required"] == keys
