@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2 (2026-11-25)
+
+- A request whose connection fails (a host name that does not resolve for a moment, a refused or
+  dropped connection) is sent again after 0.5 and then 2 seconds before it becomes a
+  `TransportError`, in Python and TypeScript. One failed DNS answer used to be enough for
+  `FundNotFound`. Timeouts and HTTP answers are not retried. `HttpxTransport(retry_delays=())` and
+  `new FetchTransport(timeoutMs, [])` turn it off.
+
 ## 0.1.1 (2026-11-02)
 
 - iShares from a server: iShares serves its site through Akamai, which refuses most cloud and

@@ -9,7 +9,13 @@ import pytest
 
 from ucits_etf_issuer_holdings import __version__
 from ucits_etf_issuer_holdings.errors import TransportError
-from ucits_etf_issuer_holdings.http import CachingTransport, HttpxTransport, Response, Transport
+from ucits_etf_issuer_holdings.http import (
+    RETRY_DELAYS,
+    CachingTransport,
+    HttpxTransport,
+    Response,
+    Transport,
+)
 
 
 def test_response_text_and_json() -> None:
@@ -58,9 +64,71 @@ def test_httpx_transport_wraps_network_errors() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         raise httpx.ConnectError("boom")
 
+    transport = HttpxTransport(
+        client=httpx.Client(transport=httpx.MockTransport(handler)), retry_delays=()
+    )
+    with pytest.raises(TransportError):
+        transport.request("GET", "https://example.com/")
+
+
+def scripted(script: list[Exception | int]) -> tuple[HttpxTransport, list[str]]:
+    """A transport that plays the script (an error to raise or a status), and the bodies sent."""
+    bodies: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        bodies.append(request.content.decode())
+        item = script[len(bodies) - 1]
+        if isinstance(item, Exception):
+            raise item
+        return httpx.Response(item)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    return HttpxTransport(client=client, retry_delays=(0.0, 0.0)), bodies
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        httpx.ConnectError("[Errno -5] No address associated with hostname"),
+        httpx.ReadError("connection reset"),
+        httpx.RemoteProtocolError("server disconnected"),
+    ],
+)
+def test_httpx_transport_retries_a_connection_failure(error: httpx.HTTPError) -> None:
+    transport, bodies = scripted([error, error, 200])
+    assert transport.request("POST", "https://example.com/p", json={"k": 1}).status == 200
+    assert len(bodies) == 3
+    assert len(set(bodies)) == 1
+
+
+def test_httpx_transport_gives_up_after_the_last_retry() -> None:
+    transport, bodies = scripted([httpx.ConnectError("no address")] * 4)
+    with pytest.raises(TransportError, match="no address"):
+        transport.request("GET", "https://example.com/")
+    assert len(bodies) == 3
+
+
+def test_httpx_transport_does_not_retry_a_timeout_or_an_answer() -> None:
+    transport, bodies = scripted([httpx.ReadTimeout("slow"), 200])
+    with pytest.raises(TransportError):
+        transport.request("GET", "https://example.com/")
+    assert len(bodies) == 1
+    transport, bodies = scripted([503, 200])
+    assert transport.request("GET", "https://example.com/").status == 503
+    assert len(bodies) == 1
+
+
+def test_httpx_transport_waits_between_tries(monkeypatch: pytest.MonkeyPatch) -> None:
+    waits: list[float] = []
+    monkeypatch.setattr("ucits_etf_issuer_holdings.http.time.sleep", waits.append)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("boom")
+
     transport = HttpxTransport(client=httpx.Client(transport=httpx.MockTransport(handler)))
     with pytest.raises(TransportError):
         transport.request("GET", "https://example.com/")
+    assert waits == list(RETRY_DELAYS)
 
 
 class FakeTransport:

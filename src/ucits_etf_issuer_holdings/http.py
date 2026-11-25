@@ -7,7 +7,7 @@ import json as jsonlib
 import os
 import tempfile
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Protocol
@@ -25,6 +25,10 @@ USER_AGENT = (
 DEFAULT_CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache") / (
     "ucits-etf-issuer-holdings"
 )
+
+# Seconds before each new try of a request whose connection failed.
+RETRY_DELAYS = (0.5, 2.0)
+RETRY_ON = (httpx.NetworkError, httpx.RemoteProtocolError)
 
 
 @dataclass(frozen=True)
@@ -75,6 +79,10 @@ class HttpxTransport:
     `proxy` (`http://`, `https://`, or `socks5://` with `httpx[socks]` installed) sends every
     request through that proxy; without it the proxy variables (HTTPS_PROXY, ALL_PROXY) are
     honoured.
+
+    A request that failed to connect (a host name that did not resolve, included) or lost its
+    connection is sent again after each of `retry_delays`, in seconds: every request this library
+    sends only reads. Timeouts and answers, whatever their status, are not retried.
     """
 
     def __init__(
@@ -82,9 +90,11 @@ class HttpxTransport:
         timeout: float = 30.0,
         client: httpx.Client | None = None,
         proxy: str | None = None,
+        retry_delays: Sequence[float] = RETRY_DELAYS,
     ) -> None:
         if client is not None and proxy is not None:
             raise ValueError("pass proxy= or client=, not both")
+        self._retry_delays = tuple(retry_delays)
         self._owned = client is None
         self._client = client or httpx.Client(
             timeout=timeout, follow_redirects=True, trust_env=True, proxy=proxy
@@ -107,10 +117,14 @@ class HttpxTransport:
     ) -> Response:
         """Send the request with the library's user agent; network errors become TransportError."""
         merged = {"User-Agent": USER_AGENT, **(headers or {})}
-        try:
-            answer = self._client.request(method, url, params=params, json=json, headers=merged)
-        except httpx.HTTPError as exc:
-            raise TransportError(f"{method} {url}: {exc}") from exc
+        for delay in (*self._retry_delays, None):
+            try:
+                answer = self._client.request(method, url, params=params, json=json, headers=merged)
+                break
+            except httpx.HTTPError as exc:
+                if delay is None or not isinstance(exc, RETRY_ON):
+                    raise TransportError(f"{method} {url}: {exc}") from exc
+                time.sleep(delay)
         return Response(
             status=answer.status_code,
             content=answer.content,

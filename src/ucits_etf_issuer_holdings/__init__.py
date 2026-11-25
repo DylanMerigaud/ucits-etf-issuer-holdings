@@ -1,6 +1,6 @@
 """Full holdings of a UCITS ETF by ISIN, read from the issuer's own published files."""
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 from .client import HoldingsClient, get_holdings
 from .errors import (

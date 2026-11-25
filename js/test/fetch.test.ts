@@ -41,12 +41,79 @@ test("fetch transport: user agent, params, headers, JSON body", async () => {
   );
   assert.equal(seen.url, "/p?x=1&y=a+b");
   assert.equal(seen.ua, USER_AGENT);
-  assert.ok(USER_AGENT.startsWith("ucits-etf-issuer-holdings/0.1.1 (+https://github.com/"));
+  assert.ok(USER_AGENT.startsWith("ucits-etf-issuer-holdings/0.1.2 (+https://github.com/"));
   assert.equal(seen.origin, "https://o");
   assert.equal(seen.ct, "application/json");
   assert.equal(seen.body, '{"k":[1,2]}');
 });
 
 test("fetch transport: network errors become TransportError", async () => {
-  await assert.rejects(new FetchTransport(2000).request("GET", "http://127.0.0.1:1/"), TransportError);
+  await assert.rejects(new FetchTransport(2000, []).request("GET", "http://127.0.0.1:1/"), TransportError);
+});
+
+/** A server that cuts the connection of the first `drops` requests, then answers. */
+async function withDrops(
+  drops: number,
+  status: number,
+  run: (base: string, bodies: string[]) => Promise<void>,
+): Promise<void> {
+  const bodies: string[] = [];
+  const server = createServer((req, res) => {
+    let body = "";
+    req.on("data", (c) => (body += c));
+    req.on("end", () => {
+      bodies.push(body);
+      if (bodies.length <= drops) req.socket.destroy();
+      else res.writeHead(status).end("{}");
+    });
+  });
+  await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
+  try {
+    await run(`http://127.0.0.1:${(server.address() as AddressInfo).port}`, bodies);
+  } finally {
+    server.closeAllConnections();
+    server.close();
+  }
+}
+
+test("fetch transport: a dropped connection is retried with the same body", async () => {
+  await withDrops(2, 200, async (base, bodies) => {
+    const answer = await new FetchTransport(5000, [0, 0]).request("POST", `${base}/p`, { json: { k: 1 } });
+    assert.equal(answer.status, 200);
+    assert.deepEqual(bodies, ['{"k":1}', '{"k":1}', '{"k":1}']);
+  });
+});
+
+test("fetch transport: gives up after the last retry", async (t) => {
+  let calls = 0;
+  t.mock.method(globalThis, "fetch", async () => {
+    calls += 1;
+    throw new TypeError("fetch failed", {
+      cause: Object.assign(new Error("connect ECONNREFUSED"), { code: "ECONNREFUSED" }),
+    });
+  });
+  await assert.rejects(new FetchTransport(5000, [0, 0]).request("GET", "http://x/"), TransportError);
+  assert.equal(calls, 3);
+});
+
+test("fetch transport: an answer is not retried, whatever its status", async () => {
+  await withDrops(0, 503, async (base, bodies) => {
+    assert.equal((await new FetchTransport(5000, [0, 0]).request("GET", base)).status, 503);
+    assert.equal(bodies.length, 1);
+  });
+});
+
+test("fetch transport: a host name that does not resolve is retried, a timeout is not", async (t) => {
+  let calls = 0;
+  t.mock.method(globalThis, "fetch", async () => {
+    calls += 1;
+    if (calls < 3) {
+      throw new TypeError("fetch failed", {
+        cause: Object.assign(new Error("getaddrinfo EAI_AGAIN x"), { code: "EAI_AGAIN" }),
+      });
+    }
+    throw new DOMException("The operation was aborted due to timeout", "TimeoutError");
+  });
+  await assert.rejects(new FetchTransport(5000, [0, 0, 0, 0]).request("GET", "http://x/"), /timeout/);
+  assert.equal(calls, 3);
 });

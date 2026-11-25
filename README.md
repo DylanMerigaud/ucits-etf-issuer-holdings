@@ -159,6 +159,8 @@ percent, and every issuer that publishes a country gives one for 100 percent of 
   copy. When an issuer is down, refuses (403), times out (408), rate limits (429) or answers
   with something the library cannot read, and an older copy exists, you get that copy with
   `fund.stale == True` rather than an error.
+- A request whose connection fails is sent again after 0.5 and then 2 seconds; timeouts and HTTP
+  answers are not retried.
 - `HoldingsClient` is a context manager (`with HoldingsClient() as client:`), or call
   `client.close()`, to release its connections.
 - Proxies: `HoldingsClient(proxy="http://...")`, `get_holdings(..., proxy=...)` or

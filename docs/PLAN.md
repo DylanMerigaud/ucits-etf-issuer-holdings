@@ -194,7 +194,8 @@ CLI: `ucits-holdings ISIN [--issuer NAME] [--format json|csv|table] [--by countr
   one), `.text`, `.json()`), `Transport` Protocol
   `request(method, url, *, params=None, json=None, headers=None, ttl=None) -> Response`,
   `HttpxTransport(timeout)` (httpx.Client, `follow_redirects=True`, trust_env so HTTPS_PROXY and
-  ALL_PROXY work; network errors become `TransportError`; `close()`),
+  ALL_PROXY work; a failed connection is tried again after each of `retry_delays`, then network
+  errors become `TransportError`; `close()`),
   `CachingTransport(inner, cache_dir)`: key = sha256 of method, url, sorted params, canonical
   JSON body; one file per key, `<key>.cache`, a JSON line of meta (`stored_at`, `content_type`,
   `url`) then the body, written to a temporary file and renamed into place; 200 answers only; a

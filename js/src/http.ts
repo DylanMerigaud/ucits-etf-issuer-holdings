@@ -97,12 +97,35 @@ export function withParams(url: string, params: Record<string, string> | null | 
   return url + (url.includes("?") ? "&" : "?") + query;
 }
 
-/** Real network transport on the global `fetch`. Proxy support is whatever your Node gives fetch. */
+/** Milliseconds before each new try of a request whose connection failed. */
+const RETRY_DELAYS_MS: readonly number[] = [500, 2000];
+
+/** The error codes of a connection that could not be made or was lost. */
+const RETRY_CODES = new Set([
+  "EAI_AGAIN",
+  "ENOTFOUND",
+  "ECONNREFUSED",
+  "ECONNRESET",
+  "EPIPE",
+  "ENETUNREACH",
+  "EHOSTUNREACH",
+  "UND_ERR_SOCKET",
+]);
+
+/**
+ * Real network transport on the global `fetch`. Proxy support is whatever your Node gives fetch.
+ *
+ * A request that failed to connect (a host name that did not resolve, included) or lost its
+ * connection is sent again after each of `retryDelaysMs`: every request this library sends only
+ * reads. Timeouts and answers, whatever their status, are not retried.
+ */
 export class FetchTransport implements Transport {
   private readonly timeoutMs: number;
+  private readonly retryDelaysMs: readonly number[];
 
-  constructor(timeoutMs = 30_000) {
+  constructor(timeoutMs = 30_000, retryDelaysMs: readonly number[] = RETRY_DELAYS_MS) {
     this.timeoutMs = timeoutMs;
+    this.retryDelaysMs = retryDelaysMs;
   }
 
   /** Send the request with the library's user agent; network errors become TransportError. */
@@ -119,25 +142,33 @@ export class FetchTransport implements Transport {
         headers["Content-Type"] = "application/json";
       }
     }
-    try {
-      const answer = await fetch(withParams(url, options.params), {
-        method,
-        headers,
-        body,
-        redirect: "follow",
-        signal: AbortSignal.timeout(this.timeoutMs),
-      });
-      const content = new Uint8Array(await answer.arrayBuffer());
-      return new HttpResponse(
-        answer.status,
-        content,
-        answer.headers.get("content-type") ?? "",
-        answer.url || url,
-      );
-    } catch (error) {
-      const cause = error instanceof Error ? (error.cause as Error | undefined) : undefined;
-      const detail = error instanceof Error ? error.message : String(error);
-      throw new TransportError(`${method} ${url}: ${cause?.message ?? detail}`);
+    for (let tries = 0; ; tries += 1) {
+      try {
+        const answer = await fetch(withParams(url, options.params), {
+          method,
+          headers,
+          body,
+          redirect: "follow",
+          signal: AbortSignal.timeout(this.timeoutMs),
+        });
+        const content = new Uint8Array(await answer.arrayBuffer());
+        return new HttpResponse(
+          answer.status,
+          content,
+          answer.headers.get("content-type") ?? "",
+          answer.url || url,
+        );
+      } catch (error) {
+        const cause =
+          error instanceof Error ? (error.cause as (Error & { code?: string }) | undefined) : undefined;
+        const delay = this.retryDelaysMs[tries];
+        if (delay !== undefined && cause?.code !== undefined && RETRY_CODES.has(cause.code)) {
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          continue;
+        }
+        const detail = error instanceof Error ? error.message : String(error);
+        throw new TransportError(`${method} ${url}: ${cause?.message ?? detail}`);
+      }
     }
   }
 }
@@ -148,7 +179,7 @@ function pyDumps(value: unknown, sortKeys: boolean, compact: boolean): string {
   const dump = (v: unknown): string => {
     if (v === null || v === undefined) return "null";
     if (typeof v === "string") {
-      return JSON.stringify(v).replace(/[\u007f-￿]/g, (c) =>
+      return JSON.stringify(v).replace(/[\u007f-\uffff]/g, (c) =>
         c === "\u007f" ? c : `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`,
       );
     }
