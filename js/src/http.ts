@@ -110,6 +110,7 @@ const RETRY_CODES = new Set([
   "ENETUNREACH",
   "EHOSTUNREACH",
   "UND_ERR_SOCKET",
+  "UND_ERR_CONNECT_TIMEOUT",
 ]);
 
 /**
@@ -117,7 +118,8 @@ const RETRY_CODES = new Set([
  *
  * A request that failed to connect (a host name that did not resolve, included) or lost its
  * connection is sent again after each of `retryDelaysMs`: every request this library sends only
- * reads. Timeouts and answers, whatever their status, are not retried.
+ * reads. A connection that timed out before it opened counts as a failed one; a timeout once the
+ * request was sent, and an answer whatever its status, are not retried.
  */
 export class FetchTransport implements Transport {
   private readonly timeoutMs: number;

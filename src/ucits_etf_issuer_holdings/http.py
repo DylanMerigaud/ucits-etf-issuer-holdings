@@ -28,7 +28,7 @@ DEFAULT_CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cac
 
 # Seconds before each new try of a request whose connection failed.
 RETRY_DELAYS = (0.5, 2.0)
-RETRY_ON = (httpx.NetworkError, httpx.RemoteProtocolError)
+RETRY_ON = (httpx.NetworkError, httpx.RemoteProtocolError, httpx.ConnectTimeout)
 
 
 @dataclass(frozen=True)
@@ -82,7 +82,8 @@ class HttpxTransport:
 
     A request that failed to connect (a host name that did not resolve, included) or lost its
     connection is sent again after each of `retry_delays`, in seconds: every request this library
-    sends only reads. Timeouts and answers, whatever their status, are not retried.
+    sends only reads. A connection that timed out before it opened counts as a failed one; a
+    timeout once the request was sent, and an answer whatever its status, are not retried.
     """
 
     def __init__(

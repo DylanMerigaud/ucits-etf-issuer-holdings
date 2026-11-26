@@ -41,7 +41,7 @@ test("fetch transport: user agent, params, headers, JSON body", async () => {
   );
   assert.equal(seen.url, "/p?x=1&y=a+b");
   assert.equal(seen.ua, USER_AGENT);
-  assert.ok(USER_AGENT.startsWith("ucits-etf-issuer-holdings/0.1.2 (+https://github.com/"));
+  assert.ok(USER_AGENT.startsWith("ucits-etf-issuer-holdings/0.1.3 (+https://github.com/"));
   assert.equal(seen.origin, "https://o");
   assert.equal(seen.ct, "application/json");
   assert.equal(seen.body, '{"k":[1,2]}');
@@ -101,6 +101,21 @@ test("fetch transport: an answer is not retried, whatever its status", async () 
     assert.equal((await new FetchTransport(5000, [0, 0]).request("GET", base)).status, 503);
     assert.equal(bodies.length, 1);
   });
+});
+
+test("fetch transport: a connection that times out before it opens is retried", async (t) => {
+  let calls = 0;
+  t.mock.method(globalThis, "fetch", async () => {
+    calls += 1;
+    if (calls < 3) {
+      throw new TypeError("fetch failed", {
+        cause: Object.assign(new Error("Connect Timeout Error"), { code: "UND_ERR_CONNECT_TIMEOUT" }),
+      });
+    }
+    return new Response("{}", { status: 200 });
+  });
+  assert.equal((await new FetchTransport(5000, [0, 0]).request("GET", "http://x/")).status, 200);
+  assert.equal(calls, 3);
 });
 
 test("fetch transport: a host name that does not resolve is retried, a timeout is not", async (t) => {

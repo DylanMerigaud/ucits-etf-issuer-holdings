@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.3 (2026-11-26)
+
+- A connection that times out before it opens (`httpx.ConnectTimeout` in Python, undici's
+  `UND_ERR_CONNECT_TIMEOUT` in TypeScript) is now retried like a refused or dropped one: no
+  request reached the issuer, so sending it again is safe. A timeout once the request was sent is
+  still not retried. One slow handshake with www.amundietf.de used to be enough for
+  `FundNotFound`.
+
 ## 0.1.2 (2026-11-25)
 
 - A request whose connection fails (a host name that does not resolve for a moment, a refused or

@@ -90,6 +90,7 @@ def scripted(script: list[Exception | int]) -> tuple[HttpxTransport, list[str]]:
     "error",
     [
         httpx.ConnectError("[Errno -5] No address associated with hostname"),
+        httpx.ConnectTimeout("timed out"),
         httpx.ReadError("connection reset"),
         httpx.RemoteProtocolError("server disconnected"),
     ],
@@ -108,7 +109,7 @@ def test_httpx_transport_gives_up_after_the_last_retry() -> None:
     assert len(bodies) == 3
 
 
-def test_httpx_transport_does_not_retry_a_timeout_or_an_answer() -> None:
+def test_httpx_transport_does_not_retry_a_read_timeout_or_an_answer() -> None:
     transport, bodies = scripted([httpx.ReadTimeout("slow"), 200])
     with pytest.raises(TransportError):
         transport.request("GET", "https://example.com/")
